@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* For WebKit browsers (Chrome, Safari, etc.) */
+::-webkit-scrollbar {
+  width: 6px; /* Set the width of the scrollbar */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5); /* Set the color of the scrollbar handle */
+  border-radius: 10px; /* Make the scrollbar handle rounded */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* Set the background of the scrollbar track to transparent */
+}
+
+/* For Firefox */
+html {
+  scrollbar-width: thin; /* Set the scrollbar width to thin */
+  scrollbar-color: rgba(0, 0, 0, 0.5) transparent; /* Set the scrollbar handle and track colors */
+}
+
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -17,19 +38,18 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+.nav-active {
+  @apply font-semibold text-white transition-all duration-500
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+nav li a:hover {
+  @apply font-semibold text-white transition-all duration-500
+}
+
+nav li a:hover span {
+  @apply bg-white w-16 transition-all duration-500
+}
+
+.nav-active span {
+  @apply bg-white w-16 transition-all duration-500
 }
