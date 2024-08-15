@@ -82,6 +82,16 @@ const techs = [
     name: "Zustand",
   },
   {
+    icon: (
+      <img
+        src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/168_Hubspot_logo_logos-512.png"
+        width="40"
+        height="40"
+      />
+    ),
+    name: "HubSpot",
+  },
+  {
     icon: <GitHubIcon width="40" height="40" />,
     name: "Github",
   },
@@ -104,10 +114,6 @@ const techs = [
   {
     icon: <FigmaIcon width="40" height="40" />,
     name: "Figma",
-  },
-  {
-    icon: <FramerMotionIcon width="40" height="40" />,
-    name: "Framer Motion",
   },
 ];
 

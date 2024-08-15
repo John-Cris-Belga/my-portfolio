@@ -10,15 +10,39 @@ const experiences = [
   {
     date: "2020 - 2024",
     position: "Software Engineer | Netfluence Corporation",
-    description:
-      "At Netfluence Corporation, I served as a Software Engineer, specializing in front-end development with React and HubSpot. I designed and implemented dynamic web applications, developed serverless functions, and created an AI chatbot for our website powered by the OpenAI API, enhancing user interaction with real-time assistance. Additionally, I independently built several internal tools that significantly improved operational efficiency. My work also involved integrating Microsoft Azure services and automating deployments using GitHub Actions.",
+    description: (
+      <div>
+        <p className="mb-4">
+          At Netfluence Corporation, I specialized in front-end development with
+          React, HubSpot, and Microsoft Azure. I developed custom React pages,
+          templates, CRM cards, workflows, and dashboard reports within HubSpot,
+          enhancing automation and streamlining operations. I also integrated
+          HubSpot APIs and serverless functions to improve backend efficiency.
+        </p>
+        <p className="mb-4">
+          Beyond HubSpot, I created and deployed an AI-powered embeddable
+          chatbot and a chatbot editor using Microsoft Azure services. The
+          chatbot, powered by the OpenAI API, provided real-time assistance and
+          improved user engagement. The solution was deployed on Azure Static
+          Web Apps, with Azure Functions handling the APIs, Azure App
+          Configuration managing feature flags, Azure Front Door for CDN, and
+          Azure Blob Storage hosting the embeddable URL for seamless access and
+          deployment across platforms.
+        </p>
+        <p className="mb-4">
+          I further automated deployments using GitHub Actions and integrated
+          external services to ensure seamless data flow, maintaining high
+          operational efficiency across all projects.
+        </p>
+      </div>
+    ),
   },
 ];
 
 export default function Experiences() {
   return (
     <section id="experiences" className="mb-16 md:mb-24 lg:mb-36">
-      <p className="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-inherit px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:hidden">
+      <p className="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-inherit px-6 py-5 backdrop-blur md:-mx-12 md:px-12 ">
         EXPERIENCE
       </p>
       <ol>
@@ -32,9 +56,9 @@ export default function Experiences() {
                 <h3 className="font-medium leading-snug text-slate-200">
                   {experience.position}
                 </h3>
-                <p className="mt-2 text-sm leading-normal text-slate-400">
+                <div className="mt-2 text-sm leading-normal text-slate-400">
                   {experience.description}
-                </p>
+                </div>
               </div>
             </div>
           </li>
