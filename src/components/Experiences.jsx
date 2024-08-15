@@ -42,7 +42,7 @@ const experiences = [
 export default function Experiences() {
   return (
     <section id="experiences" className="mb-16 md:mb-24 lg:mb-36">
-      <p className="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-inherit px-6 py-5 backdrop-blur md:-mx-12 md:px-12 ">
+      <p className="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-inherit px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:hidden">
         EXPERIENCE
       </p>
       <ol>
