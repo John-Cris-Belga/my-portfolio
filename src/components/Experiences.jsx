@@ -5,7 +5,7 @@ const experiences = [
     date: "2024 - PRESENT",
     position: "Software Developer | Upwork",
     description:
-      "As a freelance Software Developer on Upwork, I leverage my expertise to tackle a diverse range of projects. I work closely with clients to deliver high-quality, custom solutions, utilizing technologies such as React, TypeScript, and AWS. My role involves managing project scopes, ensuring timely delivery, and adapting to various development environments and client needs.",
+      "As a freelance Software Developer on Upwork, I leverage my expertise to tackle a diverse range of projects. I work closely with clients to deliver high-quality, custom solutions, utilizing technologies such as React and AWS. My role involves managing project scopes, ensuring timely delivery, and adapting to various development environments and client needs.",
   },
   {
     date: "2020 - 2024",
