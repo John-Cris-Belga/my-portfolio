@@ -1,4 +1,3 @@
-import React from "react";
 import {
   ReactIcon,
   HTMLIcon,
@@ -19,6 +18,7 @@ import {
   FigmaIcon,
   BootstrapIcon,
   FramerMotionIcon,
+  ExpressJS,
 } from "./SVG/SVG";
 
 const techs = [
@@ -104,16 +104,16 @@ const techs = [
     name: "OPENAI",
   },
   {
-    icon: <TypeScriptIcon width="40" height="40" />,
-    name: "Typescript",
+    icon: <ExpressJS width="40" height="40" />,
+    name: "ExpressJS",
   },
   {
     icon: <GitIcon width="40" height="40" />,
     name: "Git",
   },
   {
-    icon: <FigmaIcon width="40" height="40" />,
-    name: "Figma",
+    icon: <FramerMotionIcon width="40" height="40" />,
+    name: "Framer Motion",
   },
 ];
 
