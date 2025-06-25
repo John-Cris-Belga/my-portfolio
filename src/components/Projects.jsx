@@ -17,7 +17,7 @@ const projects = [
       "Blockchain Integration",
     ],
     tech_stack: ["MeshJS", "React", "AWS"],
-    url: "",
+    url: "https://www.upwork.com/freelancers/~01316681e6a97b8c12?p=1854763433609932800",
   },
   {
     name: "ConstructAI Search",
