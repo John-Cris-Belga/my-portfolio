@@ -12,6 +12,7 @@ import {
   AWSIcon,
   GitHubIcon,
   MongoDBIcon,
+  Supabase,
   OpenAIIcon,
   TypeScriptIcon,
   GitIcon,
@@ -19,6 +20,7 @@ import {
   BootstrapIcon,
   FramerMotionIcon,
   ExpressJS,
+  Fastify
 } from "./SVG/SVG";
 
 const techs = [
@@ -50,7 +52,6 @@ const techs = [
     icon: <BootstrapIcon width="40" height="40" />,
     name: "Bootstrap",
   },
-
   {
     icon: <MaterialUIIcon width="30" height="30" />,
     name: "Material UI",
@@ -60,16 +61,8 @@ const techs = [
     name: "shadcn/ui",
   },
   {
-    icon: <NodeJSIcon width="30" height="30" />,
-    name: "NodeJS",
-  },
-  {
-    icon: <AzureIcon width="30" height="30" />,
-    name: "MS Azure",
-  },
-  {
-    icon: <AWSIcon width="30" height="30" />,
-    name: "AWS",
+    icon: <FramerMotionIcon width="40" height="40" />,
+    name: "Framer Motion",
   },
   {
     icon: (
@@ -82,6 +75,26 @@ const techs = [
     name: "Zustand",
   },
   {
+    icon: <NodeJSIcon width="30" height="30" />,
+    name: "NodeJS",
+  },
+  {
+    icon: <ExpressJS width="40" height="40" />,
+    name: "ExpressJS",
+  },
+  {
+    icon: <Fastify width="40" height="40" />,
+    name: "Fastify",
+  },
+  {
+    icon: <AzureIcon width="30" height="30" />,
+    name: "MS Azure",
+  },
+  {
+    icon: <AWSIcon width="30" height="30" />,
+    name: "AWS",
+  },
+  {
     icon: <HubSpot width="40" height="40" />,
     name: "HubSpot",
   },
@@ -90,25 +103,21 @@ const techs = [
     name: "Github",
   },
   {
-    icon: <MongoDBIcon width="40" height="40" />,
-    name: "MongoDB",
-  },
-  {
-    icon: <OpenAIIcon width="40" height="40" />,
-    name: "OPENAI",
-  },
-  {
-    icon: <ExpressJS width="40" height="40" />,
-    name: "ExpressJS",
-  },
-  {
     icon: <GitIcon width="40" height="40" />,
     name: "Git",
   },
   {
-    icon: <FramerMotionIcon width="40" height="40" />,
-    name: "Framer Motion",
+    icon: <MongoDBIcon width="40" height="40" />,
+    name: "MongoDB",
   },
+  {
+    icon: <Supabase width="40" height="40" />,
+    name: "supabase",
+  },
+  {
+    icon: <OpenAIIcon width="40" height="40" />,
+    name: "OPENAI",
+  }
 ];
 
 export default function TechStack() {
@@ -117,17 +126,17 @@ export default function TechStack() {
       <p className="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-inherit px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:hidden">
         Tech Stack
       </p>
-      <ul className="flex flex-wrap justify-around md:justify-start lg:justify-between gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {techs.map((tech, i) => (
-          <li
+          <div
             key={i}
-            className="flex flex-col gap-2 justify-center items-center bg-white bg-opacity-20 min-w-fit w-24 lg:w-28 rounded py-4"
+            className="flex flex-col gap-2 justify-center items-center bg-white bg-opacity-20 rounded py-4"
           >
             <div>{tech.icon}</div>
             <span className="text-xs break-words">{tech.name}</span>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </section>
   );
 }
