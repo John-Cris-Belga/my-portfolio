@@ -25,27 +25,27 @@ import {
 
 const techs = [
   {
-    icon: <ReactIcon width="30" height="30" />,
+    icon: <ReactIcon width="50" height="50" />,
     name: "React",
   },
   {
-    icon: <NextJSIcon width="30" height="30" />,
+    icon: <NextJSIcon width="50" height="50" />,
     name: "NextJS",
   },
   {
-    icon: <HTMLIcon width="30" height="30" />,
+    icon: <HTMLIcon width="50" height="50" />,
     name: "HTML",
   },
   {
-    icon: <CSSIcon width="30" height="30" />,
+    icon: <CSSIcon width="50" height="50" />,
     name: "CSS",
   },
   {
-    icon: <JavascriptIcon width="30" height="30" />,
+    icon: <JavascriptIcon width="50" height="50" />,
     name: "Javascript",
   },
   {
-    icon: <TailwindIcon width="30" height="30" />,
+    icon: <TailwindIcon width="50" height="50" />,
     name: "Tailwind",
   },
   {
@@ -53,11 +53,11 @@ const techs = [
     name: "Bootstrap",
   },
   {
-    icon: <MaterialUIIcon width="30" height="30" />,
+    icon: <MaterialUIIcon width="50" height="50" />,
     name: "Material UI",
   },
   {
-    icon: <ShadcnIcon width="30" height="30" />,
+    icon: <ShadcnIcon width="50" height="50" />,
     name: "shadcn/ui",
   },
   {
@@ -75,7 +75,7 @@ const techs = [
     name: "Zustand",
   },
   {
-    icon: <NodeJSIcon width="30" height="30" />,
+    icon: <NodeJSIcon width="50" height="50" />,
     name: "NodeJS",
   },
   {
@@ -87,11 +87,11 @@ const techs = [
     name: "Fastify",
   },
   {
-    icon: <AzureIcon width="30" height="30" />,
+    icon: <AzureIcon width="50" height="50" />,
     name: "MS Azure",
   },
   {
-    icon: <AWSIcon width="30" height="30" />,
+    icon: <AWSIcon width="50" height="50" />,
     name: "AWS",
   },
   {
@@ -130,10 +130,12 @@ export default function TechStack() {
         {techs.map((tech, i) => (
           <div
             key={i}
-            className="flex flex-col gap-2 justify-center items-center bg-white bg-opacity-20 rounded py-4"
+            className="flex flex-col gap-3 justify-center items-center bg-white bg-opacity-20 rounded-lg py-5 px-2"
           >
-            <div>{tech.icon}</div>
-            <span className="text-xs break-words">{tech.name}</span>
+            <div className="w-10 h-10 flex items-center justify-center">
+              {tech.icon}
+            </div>
+            <span className="text-xs text-center break-words">{tech.name}</span>
           </div>
         ))}
       </div>
