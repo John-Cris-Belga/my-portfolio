@@ -15,7 +15,7 @@ import {
   OpenAIIcon,
   TypeScriptIcon,
   GitIcon,
-  FigmaIcon,
+  HubSpot,
   BootstrapIcon,
   FramerMotionIcon,
   ExpressJS,
@@ -82,13 +82,7 @@ const techs = [
     name: "Zustand",
   },
   {
-    icon: (
-      <img
-        src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/168_Hubspot_logo_logos-512.png"
-        width="40"
-        height="40"
-      />
-    ),
+    icon: <HubSpot width="40" height="40" />,
     name: "HubSpot",
   },
   {

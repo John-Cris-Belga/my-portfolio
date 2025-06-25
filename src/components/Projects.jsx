@@ -17,7 +17,7 @@ const projects = [
       "Blockchain Integration",
     ],
     tech_stack: ["MeshJS", "React", "AWS"],
-    url: "https://beta-app.cardanocasino.vip",
+    url: "",
   },
   {
     name: "ConstructAI Search",
