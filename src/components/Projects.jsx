@@ -73,15 +73,15 @@ export default function Projects() {
         {projects.map((project, i) => (
           <li
             key={i}
-            className="flex flex-col gap-2 justify-start items-start bg-white bg-opacity-20 min-w-full rounded p-4"
+            className="flex flex-col gap-2 justify-start items-start bg-white/20 min-w-full rounded p-4"
           >
             <h2 className="font-semibold">{project.name}</h2>
-            <span className="text-sm break-words">{project.description}</span>
+            <span className="text-sm wrap-break-word">{project.description}</span>
             <ul className="flex flex-wrap gap-2">
               {project.role.map((role, i) => (
                 <li
                   key={i}
-                  className="text-xs bg-white bg-opacity-40 rounded px-2"
+                  className="text-xs bg-white/40 rounded px-2"
                 >
                   {role}
                 </li>
@@ -91,7 +91,7 @@ export default function Projects() {
               {(project?.tech_stack || []).map((tech, i) => (
                 <li
                   key={i}
-                  className="text-xs bg-white bg-opacity-40 rounded px-2"
+                  className="text-xs bg-white/40 rounded px-2"
                 >
                   {tech}
                 </li>

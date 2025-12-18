@@ -130,12 +130,12 @@ export default function TechStack() {
         {techs.map((tech, i) => (
           <div
             key={i}
-            className="flex flex-col gap-3 justify-center items-center bg-white bg-opacity-20 rounded-lg py-5 px-2"
+            className="flex flex-col gap-3 justify-center items-center bg-white/20 rounded-lg py-5 px-2"
           >
             <div className="w-10 h-10 flex items-center justify-center">
               {tech.icon}
             </div>
-            <span className="text-xs text-center break-words">{tech.name}</span>
+            <span className="text-xs text-center wrap-break-word">{tech.name}</span>
           </div>
         ))}
       </div>

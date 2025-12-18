@@ -1,25 +1,29 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* For WebKit browsers (Chrome, Safari, etc.) */
 ::-webkit-scrollbar {
-  width: 6px; /* Set the width of the scrollbar */
+  width: 6px;
+  /* Set the width of the scrollbar */
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.5); /* Set the color of the scrollbar handle */
-  border-radius: 10px; /* Make the scrollbar handle rounded */
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Set the color of the scrollbar handle */
+  border-radius: 10px;
+  /* Make the scrollbar handle rounded */
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent; /* Set the background of the scrollbar track to transparent */
+  background: transparent;
+  /* Set the background of the scrollbar track to transparent */
 }
 
 /* For Firefox */
 html {
-  scrollbar-width: thin; /* Set the scrollbar width to thin */
-  scrollbar-color: rgba(0, 0, 0, 0.5) transparent; /* Set the scrollbar handle and track colors */
+  scrollbar-width: thin;
+  /* Set the scrollbar width to thin */
+  scrollbar-color: rgba(0, 0, 0, 0.5) transparent;
+  /* Set the scrollbar handle and track colors */
 }
 
 
