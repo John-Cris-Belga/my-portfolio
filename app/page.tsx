@@ -8,11 +8,12 @@ import CoderProfileCard from "@/components/CoderProfileCard";
 import TechStackSpiral from '@/components/TechStackSpiral';
 import { techStack } from '@/lib/techStack';
 import Shuffle from '@/components/Shuffle';
-import ProjectCard from '@/components/ProjectCard';
+import VentureGrid from '@/components/VentureGrid';
 import { projects } from '@/lib/projects';
 
 import Services from '@/components/Services';
 import ContactFooter from '@/components/ContactFooter';
+import TargetCursor from '@/components/TargetCursor';
 
 const headingStyle = { fontSize: 'clamp(1.75rem, 8vw, 3.5rem)' };
 
@@ -118,10 +119,8 @@ export default function Home() {
       </section>
       <section id="ventures" className="relative mt-24 sm:mt-32 w-full max-w-300">
         <SectionHeading title="VENTURES" subtitle="Companies and products I've co-founded and built." />
-        <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project) => (
-            <ProjectCard key={project.url} project={project} />
-          ))}
+        <div className="mt-10">
+          <VentureGrid projects={projects} />
         </div>
       </section>
       <div className="mt-24 sm:mt-32 w-full flex justify-center">
@@ -137,6 +136,7 @@ export default function Home() {
         exponential
         opacity={1}
       />
+      <TargetCursor />
     </main>
   );
 }

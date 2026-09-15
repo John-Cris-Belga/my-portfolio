@@ -13,13 +13,13 @@ const ContactFooter = () => (
 
     <a
       href={`mailto:${site.email}`}
-      className="mt-8 inline-flex items-center gap-2 rounded-full border border-indigo-500/60 bg-indigo-950/60 px-6 py-3 font-mono text-sm text-white transition hover:bg-indigo-600/40 focus-visible:outline-2 focus-visible:outline-cyan-400"
+      className="cursor-target mt-8 inline-flex items-center gap-2 rounded-full border border-indigo-500/60 bg-indigo-950/60 px-6 py-3 font-mono text-sm text-white transition hover:bg-indigo-600/40 focus-visible:outline-2 focus-visible:outline-cyan-400"
     >
       <TbMail className="h-5 w-5 text-cyan-400" aria-hidden="true" />
       {site.email}
     </a>
 
-    <div className="mt-8 flex justify-center gap-5">
+    <div className="mt-6 flex justify-center gap-4">
       {socials.map(({ label, href, icon: Icon }) => (
         <a
           key={label}
@@ -27,7 +27,7 @@ const ContactFooter = () => (
           target="_blank"
           rel="noopener noreferrer"
           aria-label={label}
-          className="text-gray-400 transition hover:text-white"
+          className="cursor-target rounded-md p-1.5 text-gray-400 transition hover:text-white"
         >
           <Icon className="h-6 w-6" aria-hidden="true" />
         </a>

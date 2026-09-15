@@ -118,7 +118,7 @@ function TypedRow({ row, chars, complete }) {
         <a
           key={i}
           href={seg.href}
-          className={`${seg.cls} hover:underline`}
+          className={`cursor-target ${seg.cls} hover:underline`}
           {...(seg.download
             ? { download: true }
             : seg.href.startsWith("http")

@@ -8,7 +8,7 @@ const ProjectCard = ({ project }) => {
       href={project.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex h-full flex-col overflow-hidden rounded-lg border border-[#1b2c68a0] bg-linear-to-br from-black/55 to-[#0a0d37]/55 shadow-lg transition duration-300 hover:-translate-y-1 hover:border-indigo-500/60 focus-visible:outline-2 focus-visible:outline-cyan-400"
+      className="cursor-target group flex h-full flex-col overflow-hidden rounded-[inherit] bg-[radial-gradient(120%_70%_at_0%_0%,color-mix(in_srgb,var(--accent,#6366f1)_22%,transparent),transparent_65%)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400"
     >
       <div className="flex items-center gap-3 bg-black/40 px-4 py-3">
         <div className="flex gap-1.5">

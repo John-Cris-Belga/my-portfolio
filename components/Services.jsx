@@ -13,7 +13,7 @@ const Services = () => (
     {services.map(({ icon: Icon, title, text, color }) => (
       <li
         key={title}
-        className="rounded-lg border border-[#1b2c68a0] bg-linear-to-br from-black/55 to-[#0a0d37]/55 p-5 transition duration-300 hover:-translate-y-1 hover:border-indigo-500/60"
+        className="cursor-target rounded-lg border border-[#1b2c68a0] bg-linear-to-br from-black/55 to-[#0a0d37]/55 p-5 transition-colors duration-300 hover:border-indigo-500/60"
       >
         <Icon className={`h-7 w-7 ${color}`} aria-hidden="true" />
         <h3 className="mt-4 font-semibold text-white">{title}</h3>
