@@ -202,7 +202,8 @@ const ElectricBorder = ({
     if (!ctx) return;
 
     // Configuration
-    const octaves = 10;
+    // The top two octaves are finer than the sample spacing, so they only cost CPU.
+    const octaves = 8;
     const lacunarity = 1.6;
     const gain = 0.7;
     const amplitude = chaos;
@@ -233,8 +234,12 @@ const ElectricBorder = ({
       if (!canvas || !ctx) return;
 
       const deltaTime = (currentTime - lastFrameTimeRef.current) / 1000;
-      timeRef.current += deltaTime * speed;
       lastFrameTimeRef.current = currentTime;
+      if (!visible) {
+        animationRef.current = requestAnimationFrame(drawElectricBorder);
+        return;
+      }
+      timeRef.current += Math.min(deltaTime, 0.1) * speed;
 
       // Clear canvas
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -321,6 +326,12 @@ const ElectricBorder = ({
     });
     resizeObserver.observe(container);
 
+    let visible = true;
+    const intersectionObserver = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+    });
+    intersectionObserver.observe(container);
+
     // Start animation
     animationRef.current = requestAnimationFrame(drawElectricBorder);
 
@@ -329,6 +340,7 @@ const ElectricBorder = ({
         cancelAnimationFrame(animationRef.current);
       }
       resizeObserver.disconnect();
+      intersectionObserver.disconnect();
     };
   }, [color, speed, chaos, borderRadius, octavedNoise, getRoundedRectPoint]);
 

@@ -54,7 +54,7 @@ export default function Home() {
         position="top"
         height="7rem"
         strength={2}
-        divCount={10}
+        divCount={4}
         curve="bezier"
         exponential
         opacity={1}
@@ -67,6 +67,7 @@ export default function Home() {
           speed={1.5}
           scanlineFrequency={0}
           warpAmount={0}
+          resolutionScale={0.5}
         />
       </div>
       <div className="pointer-events-none fixed right-0 top-[5vh] h-[90vh] w-full sm:w-1/2">
@@ -131,7 +132,7 @@ export default function Home() {
         position="bottom"
         height="7rem"
         strength={2}
-        divCount={10}
+        divCount={4}
         curve="bezier"
         exponential
         opacity={1}

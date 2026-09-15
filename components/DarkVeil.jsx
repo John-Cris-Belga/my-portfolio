@@ -90,10 +90,8 @@ export default function DarkVeil({
     const canvas = ref.current;
     const parent = canvas.parentElement;
 
-    const renderer = new Renderer({
-      dpr: Math.min(window.devicePixelRatio, 2),
-      canvas,
-    });
+    // The veil is a soft gradient, so render a low-res buffer and let the browser upscale it.
+    const renderer = new Renderer({ dpr: 1, canvas, antialias: false, powerPreference: "low-power" });
 
     const gl = renderer.gl;
     const geometry = new Triangle(gl);
@@ -117,8 +115,13 @@ export default function DarkVeil({
     const resize = () => {
       const w = parent.clientWidth,
         h = parent.clientHeight;
-      renderer.setSize(w * resolutionScale, h * resolutionScale);
-      program.uniforms.uResolution.value.set(w, h);
+      const bw = Math.max(1, Math.round(w * resolutionScale));
+      const bh = Math.max(1, Math.round(h * resolutionScale));
+      renderer.setSize(bw, bh);
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+      // Half the buffer size reproduces the original retina (2x) framing of the pattern.
+      program.uniforms.uResolution.value.set(bw / 2, bh / 2);
     };
 
     window.addEventListener("resize", resize);

@@ -13,7 +13,7 @@ const ContactFooter = () => (
 
     <a
       href={`mailto:${site.email}`}
-      className="mt-8 inline-flex items-center gap-2 rounded-full border border-indigo-500/60 bg-indigo-600/20 px-6 py-3 font-mono text-sm text-white backdrop-blur-sm transition hover:bg-indigo-600/40 focus-visible:outline-2 focus-visible:outline-cyan-400"
+      className="mt-8 inline-flex items-center gap-2 rounded-full border border-indigo-500/60 bg-indigo-950/60 px-6 py-3 font-mono text-sm text-white transition hover:bg-indigo-600/40 focus-visible:outline-2 focus-visible:outline-cyan-400"
     >
       <TbMail className="h-5 w-5 text-cyan-400" aria-hidden="true" />
       {site.email}

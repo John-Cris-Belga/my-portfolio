@@ -24,7 +24,6 @@ const TechStackSpiral = ({
   cardRadius = 20,
   centerScale = 1.2,
   edgeFade = 0.3,
-  edgeBlur = 6,
   className = "",
 }) => {
   const rootRef = useRef(null);
@@ -38,11 +37,14 @@ const TechStackSpiral = ({
     let previousTime = performance.now();
     let progress = 0;
     let visible = true;
+    let laidOut = false;
+    const zIndices = [];
     let bounds = root.getBoundingClientRect();
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const resizeObserver = new ResizeObserver(() => {
       bounds = root.getBoundingClientRect();
+      laidOut = false;
     });
     resizeObserver.observe(root);
 
@@ -58,9 +60,15 @@ const TechStackSpiral = ({
       const delta = Math.min((time - previousTime) / 1000, 0.05);
       previousTime = time;
 
-      if (visible && !reducedMotion.matches) {
+      if (!visible || reducedMotion.matches) {
+        if (laidOut) {
+          frameId = requestAnimationFrame(render);
+          return;
+        }
+      } else {
         progress += speed * (direction === "down" ? -1 : 1) * delta;
       }
+      laidOut = true;
 
       const count = items.length;
       const half = count / 2;
@@ -86,12 +94,16 @@ const TechStackSpiral = ({
         const z = Math.cos(angleRadians) * responsiveRadius;
         const depthScale = clamp(perspective / Math.max(perspective - z, 1), 0.72, 1.45);
         const depth = (z / Math.max(responsiveRadius, 1) + 1) / 2;
-        const blur = edgeBlur * smoothstep(0.35, 1, edge);
 
-        card.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${offset * spacing}px, 0) scale(${scale * depthScale})`;
-        card.style.opacity = opacity.toFixed(3);
-        card.style.filter = blur > 0.01 ? `blur(${blur.toFixed(2)}px)` : "none";
-        card.style.zIndex = String(Math.round(depth * 100000) + index);
+        // Only transform and opacity change per frame so tiles stay on the compositor.
+        card.style.transform = `translate3d(calc(-50% + ${x.toFixed(1)}px), calc(-50% + ${(offset * spacing).toFixed(1)}px), 0) scale(${(scale * depthScale).toFixed(3)})`;
+        card.style.opacity = opacity.toFixed(2);
+        // Re-stacking layers is expensive, so only touch z-index when the depth bucket changes.
+        const zIndex = Math.round(depth * count) * 100 + index;
+        if (zIndices[index] !== zIndex) {
+          zIndices[index] = zIndex;
+          card.style.zIndex = String(zIndex);
+        }
       });
 
       frameId = requestAnimationFrame(render);
@@ -116,14 +128,12 @@ const TechStackSpiral = ({
     cardsPerTurn,
     centerScale,
     edgeFade,
-    edgeBlur,
   ]);
 
   return (
     <div
       ref={rootRef}
       className={`tech-spiral ${className}`.trim()}
-      style={{ perspective: `${perspective}px` }}
       aria-hidden="true"
     >
       <div className="tech-spiral__stage">

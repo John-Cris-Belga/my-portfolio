@@ -5,12 +5,12 @@
   overflow: hidden;
   pointer-events: none;
   isolation: isolate;
+  contain: strict;
 }
 
 .tech-spiral__stage {
   position: absolute;
   inset: 0;
-  transform-style: preserve-3d;
 }
 
 .tech-spiral__item {
@@ -22,10 +22,8 @@
   justify-content: center;
   border: 1px solid rgb(255 255 255 / 0.24);
   background: rgb(255 255 255 / 0.08);
-  box-shadow: 0 14px 38px rgb(8 6 18 / 0.2);
-  transform-style: preserve-3d;
   backface-visibility: hidden;
-  will-change: transform, opacity, filter;
+  will-change: transform, opacity;
 }
 
 .tech-spiral__icon {

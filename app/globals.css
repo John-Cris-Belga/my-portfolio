@@ -46,6 +46,13 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+    --animate-cursor-blink: cursor-blink 1.06s steps(1, end) infinite;
+
+    @keyframes cursor-blink {
+        50% {
+            opacity: 0;
+        }
+    }
 }
 
 :root {

@@ -127,7 +127,8 @@ const ProfileCardComponent = ({
         Math.abs(targetX - currentX) > 0.05 ||
         Math.abs(targetY - currentY) > 0.05;
 
-      if (stillFar || document.hasFocus()) {
+      // Stop once settled; the old `|| document.hasFocus()` kept repainting the card every frame forever.
+      if (stillFar) {
         rafId = requestAnimationFrame(step);
       } else {
         running = false;

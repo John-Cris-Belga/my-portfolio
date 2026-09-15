@@ -147,9 +147,9 @@ const LineNumber = ({ n, className }) => (
   </span>
 );
 
-const Cursor =({ visible }) => (
+const Cursor = ({ blink }) => (
   <span
-    className={`ml-0.5 inline-block h-[1em] w-[0.5em] bg-neutral-300 align-middle transition-opacity duration-100 ${visible ? "" : "opacity-0"}`}
+    className={`ml-0.5 inline-block h-[1em] w-[0.5em] bg-neutral-300 align-middle ${blink ? "animate-cursor-blink" : ""}`}
   />
 );
 
@@ -158,7 +158,6 @@ const CoderProfileCard = () => {
   const [phase, setPhase] = useState("idle");
   const [rowIndex, setRowIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
-  const [cursorVisible, setCursorVisible] = useState(true);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -200,11 +199,6 @@ const CoderProfileCard = () => {
     return () => clearTimeout(t);
   }, [phase, rowIndex, charIndex]);
 
-  useEffect(() => {
-    const interval = setInterval(() => setCursorVisible((v) => !v), 530);
-    return () => clearInterval(interval);
-  }, []);
-
   const typing = phase === "typing";
   const done = phase === "done";
 
@@ -228,8 +222,9 @@ const CoderProfileCard = () => {
       </div>
 
       <div className="overflow-hidden border-t-2 border-indigo-900 px-4 lg:px-8 py-4 lg:py-8 relative">
-        <div className="absolute -top-24 -left-24 w-56 h-56 bg-blue-600 rounded-full opacity-10 filter blur-3xl"></div>
-        <div className="absolute -bottom-24 -right-24 w-56 h-56 bg-pink-600 rounded-full opacity-10 filter blur-3xl"></div>
+        {/* Radial gradients instead of blur filters: same glow, no per-frame filter repaint while typing. */}
+        <div className="pointer-events-none absolute -top-40 -left-40 h-96 w-96 bg-[radial-gradient(circle,rgba(37,99,235,0.1)_0%,transparent_60%)]"></div>
+        <div className="pointer-events-none absolute -bottom-40 -right-40 h-96 w-96 bg-[radial-gradient(circle,rgba(219,39,119,0.1)_0%,transparent_60%)]"></div>
 
         {/* Invisible full copy reserves the final height (and shows the line numbers) so the card doesn't grow while typing. */}
         <div className="relative w-full min-w-0 font-mono text-xs sm:text-sm lg:text-base">
@@ -256,8 +251,8 @@ const CoderProfileCard = () => {
                       chars={complete ? rowLength(row) : charIndex}
                       complete={complete}
                     />
-                    {typing && i === rowIndex && <Cursor visible />}
-                    {done && i === ROWS.length - 1 && <Cursor visible={cursorVisible} />}
+                    {typing && i === rowIndex && <Cursor />}
+                    {done && i === ROWS.length - 1 && <Cursor blink />}
                   </div>
                 </div>
               );
@@ -266,16 +261,17 @@ const CoderProfileCard = () => {
         </div>
       </div>
 
-      <div className="px-4 lg:px-8 pb-4 mt-4 border-t border-gray-800 pt-3 text-xs text-gray-500 flex justify-between items-center gap-2">
-        <span>UTF-8</span>
-        <span className="flex items-center gap-1.5">
+      {/* Equal side columns keep the middle item centered while the Ln/Col text changes width. */}
+      <div className="px-4 lg:px-8 pb-4 mt-4 border-t border-gray-800 pt-3 text-xs text-gray-500 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+        <span className="justify-self-start">UTF-8</span>
+        <span className="flex items-center gap-1.5 whitespace-nowrap">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-60 motion-reduce:animate-none" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-green-400" />
           </span>
           Available for projects
         </span>
-        <span>
+        <span className="justify-self-end whitespace-nowrap tabular-nums">
           Ln {Math.min(rowIndex + 1, ROWS.length)}, Col {typing ? charIndex + 1 : rowLength(ROWS[rowIndex]) + 1}
         </span>
       </div>
