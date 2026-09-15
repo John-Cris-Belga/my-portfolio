@@ -1,0 +1,94 @@
+import type { Metadata, Viewport } from "next";
+import { Geist, Geist_Mono, Inter, Press_Start_2P } from "next/font/google";
+import "./globals.css";
+import { cn } from "@/lib/utils";
+import { buildJsonLd, site } from "@/lib/site";
+
+const pressStart2P = Press_Start_2P({
+  weight: '400', // Press Start 2P only has one weight
+  subsets: ['latin'],
+  variable: '--font-press-start', // optional, for CSS var usage
+})
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  metadataBase: new URL(site.url),
+  title: {
+    default: site.title,
+    template: `%s | ${site.name}`,
+  },
+  description: site.shortDescription,
+  applicationName: site.name,
+  authors: [{ name: site.name, url: site.url }],
+  creator: site.name,
+  publisher: site.name,
+  keywords: site.keywords,
+  category: "technology",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "profile",
+    url: "/",
+    siteName: site.name,
+    title: site.title,
+    description: site.shortDescription,
+    locale: "en_PH",
+    firstName: "Chris",
+    lastName: "Belga",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: site.title,
+    description: site.shortDescription,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  formatDetection: { email: false, telephone: false, address: false },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  colorScheme: "dark",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html
+      lang="en"
+      className={cn("h-full", "antialiased", geistSans.variable, pressStart2P.className, geistMono.variable, "font-sans", inter.variable)}
+    >
+      <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(buildJsonLd()).replace(/</g, "\\u003c"),
+          }}
+        />
+        {children}
+      </body>
+    </html>
+  );
+}

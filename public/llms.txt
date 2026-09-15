@@ -1,0 +1,35 @@
+# Chris Belga
+
+> Full-stack web developer and HubSpot admin based in Bicol, Philippines. A mechanical engineer turned software developer who builds web apps with React, Next.js, and Node.js. Available for projects.
+
+## Contact
+
+- Email: inquiry@chrisbelga.dev
+- Website: https://chrisbelga.dev
+- GitHub: https://github.com/John-Cris-Belga
+- LinkedIn: https://www.linkedin.com/in/chris-b-730791112/
+
+## Profile
+
+- Roles: Web Developer, HubSpot Admin
+- Seniority: Mid-Level
+- Location: Philippines (Bicol)
+- Education: BS in Mechanical Engineering; Full Stack Web Development
+- Languages: Filipino, English
+
+## Ventures
+
+- [Eduble Startup Inc.](https://eduble.ph): A Filipino edtech startup building affordable learning apps for every learner, from grade school to the board exam and beyond.
+- [Reviewlution](https://reviewlution.online): A gamified reviewer for Philippine board exams with timed rounds, streaks, leaderboards, and a projected board rating. 8,700+ users across 557 schools.
+- [Arvotech IT Solutions](https://arvotech.solutions): A web studio that designs and engineers websites, web apps, UI/UX, and brand identities.
+
+## Tech stack
+
+React, Next.js, HTML, CSS, JavaScript, Tailwind CSS, Bootstrap, Material UI, shadcn/ui, Framer Motion, Zustand, Node.js, Express.js, Fastify, Microsoft Azure, AWS, HubSpot, Zapier, Monday, JustCall, GitHub, Git, MongoDB, Supabase, OpenAI, Claude, Codex
+
+## Services
+
+- Custom business systems, such as booking appointment systems and inventory management systems
+- HubSpot administration, CRM setup, workflows, and integrations
+- Automation with Zapier and third-party APIs
+- Business websites
