@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useRef, useCallback, useMemo, useState } from "react";
+import React, { useEffect, useRef, useCallback, useMemo } from "react";
+import AvatarMorph from "./AvatarMorph";
 import "./ProfileCard.css";
 
 const DEFAULT_INNER_GRADIENT =
@@ -49,16 +50,6 @@ const ProfileCardComponent = ({
   const avatars = (avatarUrls?.length ? avatarUrls : [avatarUrl]).map((a) =>
     typeof a === "string" ? { src: a } : a,
   );
-  const [activeAvatar, setActiveAvatar] = useState(0);
-
-  useEffect(() => {
-    if (avatars.length < 2) return;
-    const id = setInterval(
-      () => setActiveAvatar((i) => (i + 1) % avatars.length),
-      slideInterval,
-    );
-    return () => clearInterval(id);
-  }, [avatars.length, slideInterval]);
 
   const enterTimerRef = useRef(null);
   const leaveRafRef = useRef(null);
@@ -351,20 +342,12 @@ const ProfileCardComponent = ({
             <div className="pc-shine" />
             <div className="pc-glare" />
             <div className="pc-content pc-avatar-content">
-              {avatars.map(({ src, position }, i) => (
-                <img
-                  key={src}
-                  className={`avatar${i === activeAvatar ? " is-active" : ""}`}
-                  src={src}
-                  style={position ? { objectPosition: position } : undefined}
-                  alt={i === activeAvatar ? `${name || "User"} avatar` : ""}
-                  aria-hidden={i !== activeAvatar}
-                  onError={(e) => {
-                    const t = e.target;
-                    t.style.display = "none";
-                  }}
-                />
-              ))}
+              <AvatarMorph
+                images={avatars}
+                interval={slideInterval}
+                className="avatar"
+                label={`${name || "User"} avatar`}
+              />
               {showUserInfo && (
                 <div className="pc-user-info">
                   <div className="pc-user-details">
