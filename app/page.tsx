@@ -73,7 +73,7 @@ export default function Home() {
       <div className="pointer-events-none fixed right-0 top-[5vh] h-[90vh] w-full sm:w-1/2">
         <TechStackSpiral items={techStack} />
       </div>
-      <div className="relative flex flex-col items-center justify-center lg:flex-row mt-20 sm:mt-24 lg:mt-32 gap-10 lg:gap-12 w-full max-w-300">
+      <div className="relative flex flex-col items-center justify-center lg:flex-row mt-32 sm:mt-36 lg:mt-40 gap-10 lg:gap-12 w-full max-w-300">
         <ElectricBorder
           color="#7df9ff"
           speed={1}
