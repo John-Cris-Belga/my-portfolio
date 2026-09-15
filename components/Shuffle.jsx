@@ -44,11 +44,25 @@ const Shuffle = ({
   const hoverHandlerRef = useRef(null);
 
   useEffect(() => {
-    if ('fonts' in document) {
-      if (document.fonts.status === 'loaded') setFontsLoaded(true);
-      else document.fonts.ready.then(() => setFontsLoaded(true));
-    } else setFontsLoaded(true);
-  }, []);
+    const el = ref.current;
+    if (!el || !('fonts' in document)) {
+      setFontsLoaded(true);
+      return;
+    }
+    // Web fonts load lazily, so wait for this element's own font before measuring glyph widths.
+    const { fontSize, fontFamily } = getComputedStyle(el);
+    let cancelled = false;
+    document.fonts
+      .load(`${fontSize} ${fontFamily}`, text)
+      .catch(() => {})
+      .then(() => document.fonts.ready)
+      .then(() => {
+        if (!cancelled) setFontsLoaded(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [text]);
 
   const scrollTriggerStart = useMemo(() => {
     const startPct = (1 - threshold) * 100;
@@ -349,7 +363,18 @@ const Shuffle = ({
         onEnter: create
       });
 
+      // Letter wrappers use pixel widths; drop them when the width changes so the text reflows.
+      let lastWidth = el.getBoundingClientRect().width;
+      const resizeObserver = new ResizeObserver(([entry]) => {
+        const width = entry.contentRect.width;
+        if (Math.abs(width - lastWidth) < 1) return;
+        lastWidth = width;
+        if (!playingRef.current && wrappersRef.current.length) teardown();
+      });
+      resizeObserver.observe(el);
+
       return () => {
+        resizeObserver.disconnect();
         st.kill();
         removeHover();
         teardown();
