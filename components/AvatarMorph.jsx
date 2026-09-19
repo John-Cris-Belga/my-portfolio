@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Renderer, Triangle, Program, Mesh, Texture } from "ogl";
 import { gsap } from "gsap";
+import { afterIdle } from "@/lib/afterIdle";
 
 // Adapted from React Bits "Morph Slider" (melt transition): swaps photos on a timer,
 // keeps transparency, and only renders while a transition is running.
@@ -131,141 +132,153 @@ export default function AvatarMorph({
   const imagesKey = JSON.stringify(images.map(({ src, position }) => [src, position ?? ""]));
 
   useEffect(() => {
-    const images = JSON.parse(imagesKey).map(([src, position]) => ({ src, position: position || undefined }));
-    const canvas = canvasRef.current;
-    const parent = canvas?.parentElement;
-    if (!canvas || !parent || images.length === 0) return;
+    // WebGL setup compiles a shader; defer it past first paint (the plain photo shows meanwhile).
+    const setupMorph = () => {
+      const images = JSON.parse(imagesKey).map(([src, position]) => ({ src, position: position || undefined }));
+      const canvas = canvasRef.current;
+      const parent = canvas?.parentElement;
+      if (!canvas || !parent || images.length === 0) return;
 
-    let renderer;
-    try {
-      renderer = new Renderer({
-        canvas,
-        alpha: true,
-        premultipliedAlpha: true,
-        antialias: false,
-        dpr: Math.min(window.devicePixelRatio || 1, 2),
-      });
-    } catch {
-      return;
-    }
-    const gl = renderer.gl;
-    gl.clearColor(0, 0, 0, 0);
+      let renderer;
+      try {
+        renderer = new Renderer({
+          canvas,
+          alpha: true,
+          premultipliedAlpha: true,
+          antialias: false,
+          dpr: Math.min(window.devicePixelRatio || 1, 2),
+        });
+      } catch {
+        return;
+      }
+      const gl = renderer.gl;
+      gl.clearColor(0, 0, 0, 0);
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const blank = new Texture(gl, { image: new Uint8Array(4), width: 1, height: 1, generateMipmaps: false });
-    const textures = images.map(() => blank);
-    const sizes = images.map(() => [1, 1]);
-    const focuses = images.map((img) => parseFocus(img.position));
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const blank = new Texture(gl, { image: new Uint8Array(4), width: 1, height: 1, generateMipmaps: false });
+      const textures = images.map(() => blank);
+      const sizes = images.map(() => [1, 1]);
+      const focuses = images.map((img) => parseFocus(img.position));
 
-    const program = new Program(gl, {
-      vertex,
-      fragment,
-      depthTest: false,
-      uniforms: {
-        tCurrent: { value: blank },
-        tNext: { value: blank },
-        uResolution: { value: [1, 1] },
-        uCurrentSize: { value: sizes[0] },
-        uNextSize: { value: sizes[0] },
-        uCurrentFocus: { value: focuses[0] },
-        uNextFocus: { value: focuses[0] },
-        uProgress: { value: 0 },
-        uIntensity: { value: intensity },
-        uScale: { value: scale },
-        uAberration: { value: aberration },
-        uTime: { value: 0 },
-        uReduce: { value: reduce ? 1 : 0 },
-      },
-    });
-    const mesh = new Mesh(gl, { geometry: new Triangle(gl), program });
-    const u = program.uniforms;
-
-    let current = 0;
-    let animating = false;
-    let tween = null;
-    let raf = 0;
-
-    const render = () => renderer.render({ scene: mesh });
-
-    const show = (i, slot) => {
-      u[`t${slot}`].value = textures[i];
-      u[`u${slot}Size`].value = sizes[i];
-      u[`u${slot}Focus`].value = focuses[i];
-    };
-
-    const resize = () => {
-      const rect = parent.getBoundingClientRect();
-      renderer.setSize(Math.max(rect.width, 1), Math.max(rect.height, 1));
-      canvas.style.width = "100%";
-      canvas.style.height = "100%";
-      u.uResolution.value = [gl.canvas.width, gl.canvas.height];
-      if (!animating) render();
-    };
-    const resizeObserver = new ResizeObserver(resize);
-    resizeObserver.observe(parent);
-    resize();
-
-    images.forEach((image, i) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        const texture = new Texture(gl, { generateMipmaps: false, premultiplyAlpha: true });
-        texture.image = img;
-        textures[i] = texture;
-        sizes[i] = [img.naturalWidth || 1, img.naturalHeight || 1];
-        if (i === current && !animating) {
-          show(i, "Current");
-          render();
-          setReady(true);
-        }
-      };
-      img.src = image.src;
-    });
-
-    const next = () => {
-      const target = (current + 1) % images.length;
-      if (animating || images.length < 2 || textures[target] === blank) return;
-      show(current, "Current");
-      show(target, "Next");
-      animating = true;
-
-      const tick = (t) => {
-        u.uTime.value = t * 0.001;
-        render();
-        raf = requestAnimationFrame(tick);
-      };
-      raf = requestAnimationFrame(tick);
-
-      tween = gsap.fromTo(
-        u.uProgress,
-        { value: 0 },
-        {
-          value: 1,
-          duration: reduce ? Math.min(duration, 0.4) : duration,
-          ease: "power2.inOut",
-          onComplete: () => {
-            cancelAnimationFrame(raf);
-            current = target;
-            show(target, "Current");
-            u.uProgress.value = 0;
-            render();
-            animating = false;
-            tween = null;
-          },
+      const program = new Program(gl, {
+        vertex,
+        fragment,
+        depthTest: false,
+        uniforms: {
+          tCurrent: { value: blank },
+          tNext: { value: blank },
+          uResolution: { value: [1, 1] },
+          uCurrentSize: { value: sizes[0] },
+          uNextSize: { value: sizes[0] },
+          uCurrentFocus: { value: focuses[0] },
+          uNextFocus: { value: focuses[0] },
+          uProgress: { value: 0 },
+          uIntensity: { value: intensity },
+          uScale: { value: scale },
+          uAberration: { value: aberration },
+          uTime: { value: 0 },
+          uReduce: { value: reduce ? 1 : 0 },
         },
-      );
+      });
+      const mesh = new Mesh(gl, { geometry: new Triangle(gl), program });
+      const u = program.uniforms;
+
+      let current = 0;
+      let animating = false;
+      let tween = null;
+      let raf = 0;
+
+      const render = () => renderer.render({ scene: mesh });
+
+      const show = (i, slot) => {
+        u[`t${slot}`].value = textures[i];
+        u[`u${slot}Size`].value = sizes[i];
+        u[`u${slot}Focus`].value = focuses[i];
+      };
+
+      const resize = () => {
+        const rect = parent.getBoundingClientRect();
+        renderer.setSize(Math.max(rect.width, 1), Math.max(rect.height, 1));
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
+        u.uResolution.value = [gl.canvas.width, gl.canvas.height];
+        if (!animating) render();
+      };
+      const resizeObserver = new ResizeObserver(resize);
+      resizeObserver.observe(parent);
+      resize();
+
+      images.forEach((image, i) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+          const texture = new Texture(gl, { generateMipmaps: false, premultiplyAlpha: true });
+          texture.image = img;
+          textures[i] = texture;
+          sizes[i] = [img.naturalWidth || 1, img.naturalHeight || 1];
+          if (i === current && !animating) {
+            show(i, "Current");
+            render();
+            setReady(true);
+          }
+        };
+        img.src = image.src;
+      });
+
+      const next = () => {
+        const target = (current + 1) % images.length;
+        if (animating || images.length < 2 || textures[target] === blank) return;
+        show(current, "Current");
+        show(target, "Next");
+        animating = true;
+
+        const tick = (t) => {
+          u.uTime.value = t * 0.001;
+          render();
+          raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+
+        tween = gsap.fromTo(
+          u.uProgress,
+          { value: 0 },
+          {
+            value: 1,
+            duration: reduce ? Math.min(duration, 0.4) : duration,
+            ease: "power2.inOut",
+            onComplete: () => {
+              cancelAnimationFrame(raf);
+              current = target;
+              show(target, "Current");
+              u.uProgress.value = 0;
+              render();
+              animating = false;
+              tween = null;
+            },
+          },
+        );
+      };
+
+      const timer = setInterval(() => {
+        if (!document.hidden) next();
+      }, interval);
+
+      return () => {
+        clearInterval(timer);
+        cancelAnimationFrame(raf);
+        tween?.kill();
+        resizeObserver.disconnect();
+        gl.getExtension("WEBGL_lose_context")?.loseContext();
+      };
     };
 
-    const timer = setInterval(() => {
-      if (!document.hidden) next();
-    }, interval);
-
+    let dispose;
+    const cancelIdle = afterIdle(() => {
+      dispose = setupMorph();
+    }, 900);
     return () => {
-      clearInterval(timer);
-      cancelAnimationFrame(raf);
-      tween?.kill();
-      resizeObserver.disconnect();
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
+      cancelIdle();
+      dispose?.();
     };
   }, [imagesKey, interval, duration, intensity, scale, aberration]);
 

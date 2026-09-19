@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
+import { afterIdle } from "@/lib/afterIdle";
 import "./ElectricBorder.css";
 
 const ElectricBorder = ({
@@ -230,15 +231,9 @@ const ElectricBorder = ({
 
     let { width, height } = updateSize();
 
-    const drawElectricBorder = (currentTime) => {
-      if (!canvas || !ctx) return;
-
+    const paint = (currentTime) => {
       const deltaTime = (currentTime - lastFrameTimeRef.current) / 1000;
       lastFrameTimeRef.current = currentTime;
-      if (!visible) {
-        animationRef.current = requestAnimationFrame(drawElectricBorder);
-        return;
-      }
       timeRef.current += Math.min(deltaTime, 0.1) * speed;
 
       // Clear canvas
@@ -314,8 +309,16 @@ const ElectricBorder = ({
 
       ctx.closePath();
       ctx.stroke();
+    };
 
-      animationRef.current = requestAnimationFrame(drawElectricBorder);
+    // The flicker reads the same at 30fps, and it halves the per-frame noise work.
+    const FRAME_MS = 1000 / 30;
+    let lastPaint = -Infinity;
+    const loop = (currentTime) => {
+      animationRef.current = requestAnimationFrame(loop);
+      if (!visible || currentTime - lastPaint < FRAME_MS - 1) return;
+      lastPaint = currentTime;
+      paint(currentTime);
     };
 
     // Handle resize
@@ -332,10 +335,14 @@ const ElectricBorder = ({
     });
     intersectionObserver.observe(container);
 
-    // Start animation
-    animationRef.current = requestAnimationFrame(drawElectricBorder);
+    // Draw one static frame now; start animating once the page is idle.
+    paint(performance.now());
+    const cancelIdle = afterIdle(() => {
+      animationRef.current = requestAnimationFrame(loop);
+    }, 600);
 
     return () => {
+      cancelIdle();
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }

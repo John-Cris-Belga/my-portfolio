@@ -6,6 +6,12 @@
   pointer-events: none;
   isolation: isolate;
   contain: strict;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.tech-spiral.is-ready {
+  opacity: 1;
 }
 
 .tech-spiral__stage {

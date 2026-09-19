@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
+import { afterIdle } from "@/lib/afterIdle";
 import "./TechStackSpiral.css";
 
 // Adapted from React Bits "Infinite Spiral" to render icon items as a non-interactive background.
@@ -109,9 +110,14 @@ const TechStackSpiral = ({
       frameId = requestAnimationFrame(render);
     };
 
-    frameId = requestAnimationFrame(render);
+    const cancelIdle = afterIdle(() => {
+      previousTime = performance.now();
+      frameId = requestAnimationFrame(render);
+      root.classList.add("is-ready");
+    }, 300);
 
     return () => {
+      cancelIdle();
       cancelAnimationFrame(frameId);
       resizeObserver.disconnect();
       intersectionObserver.disconnect();

@@ -55,7 +55,7 @@ export default function Home() {
         position="top"
         height="7rem"
         strength={2}
-        divCount={4}
+        divCount={2}
         curve="bezier"
         exponential
         opacity={1}
@@ -131,7 +131,7 @@ export default function Home() {
         position="bottom"
         height="7rem"
         strength={2}
-        divCount={4}
+        divCount={2}
         curve="bezier"
         exponential
         opacity={1}

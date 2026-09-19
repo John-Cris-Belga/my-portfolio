@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Inter, Press_Start_2P } from "next/font/google";
+import { Geist_Mono, Inter, Press_Start_2P } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { buildJsonLd, site } from "@/lib/site";
@@ -11,11 +11,6 @@ const pressStart2P = Press_Start_2P({
 })
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -78,7 +73,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", geistSans.variable, pressStart2P.className, geistMono.variable, "font-sans", inter.variable)}
+      className={cn("h-full", "antialiased", pressStart2P.className, geistMono.variable, "font-sans", inter.variable)}
     >
       <body className="min-h-full flex flex-col">
         {/* Runs before load so the browser never restores a mid-page scroll on refresh; #anchors still work. */}

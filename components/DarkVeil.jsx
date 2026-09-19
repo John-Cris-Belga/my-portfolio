@@ -2,6 +2,7 @@
 
 import { useRef, useEffect } from "react";
 import { Renderer, Program, Mesh, Triangle, Vec2 } from "ogl";
+import { afterIdle } from "@/lib/afterIdle";
 import "./DarkVeil.css";
 
 const vertex = `
@@ -129,8 +130,14 @@ export default function DarkVeil({
 
     const start = performance.now();
     let frame = 0;
+    // The veil drifts slowly, so 30fps looks identical and halves the GPU work.
+    const FRAME_MS = 1000 / 30;
+    let lastRender = -Infinity;
 
-    const loop = () => {
+    const loop = (now) => {
+      frame = requestAnimationFrame(loop);
+      if (now - lastRender < FRAME_MS - 1) return;
+      lastRender = now;
       program.uniforms.uTime.value =
         ((performance.now() - start) / 1000) * speed;
       program.uniforms.uHueShift.value = hueShift;
@@ -139,12 +146,18 @@ export default function DarkVeil({
       program.uniforms.uScanFreq.value = scanlineFrequency;
       program.uniforms.uWarp.value = warpAmount;
       renderer.render({ scene: mesh });
-      frame = requestAnimationFrame(loop);
     };
 
-    loop();
+    // Compiling this shader is expensive, so wait until the first paint is done, then fade in.
+    const cancelIdle = afterIdle(() => {
+      frame = requestAnimationFrame((now) => {
+        loop(now);
+        canvas.classList.add("is-ready");
+      });
+    });
 
     return () => {
+      cancelIdle();
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", resize);
     };
