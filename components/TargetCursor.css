@@ -59,3 +59,14 @@
 .has-target-cursor * {
   cursor: none !important;
 }
+
+/* Zones that opt out of the custom cursor get the system cursor back. */
+.has-target-cursor [data-cursor="native"],
+.has-target-cursor [data-cursor="native"] * {
+  cursor: auto !important;
+}
+
+.has-target-cursor [data-cursor="native"] a,
+.has-target-cursor [data-cursor="native"] a * {
+  cursor: pointer !important;
+}

@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { Renderer, Program, Mesh, Triangle, Vec2 } from "ogl";
 import { afterIdle } from "@/lib/afterIdle";
+import { isLite, onLite } from "@/lib/perfMode";
 import "./DarkVeil.css";
 
 const vertex = `
@@ -90,76 +90,137 @@ export default function DarkVeil({
   useEffect(() => {
     const canvas = ref.current;
     const parent = canvas.parentElement;
-
-    // The veil is a soft gradient, so render a low-res buffer and let the browser upscale it.
-    const renderer = new Renderer({ dpr: 1, canvas, antialias: false, powerPreference: "low-power" });
-
-    const gl = renderer.gl;
-    const geometry = new Triangle(gl);
-
-    const program = new Program(gl, {
-      vertex,
-      fragment,
-      uniforms: {
-        uTime: { value: 0 },
-        uResolution: { value: new Vec2() },
-        uHueShift: { value: hueShift },
-        uNoise: { value: noiseIntensity },
-        uScan: { value: scanlineIntensity },
-        uScanFreq: { value: scanlineFrequency },
-        uWarp: { value: warpAmount },
-      },
-    });
-
-    const mesh = new Mesh(gl, { geometry, program });
-
-    const resize = () => {
-      const w = parent.clientWidth,
-        h = parent.clientHeight;
-      const bw = Math.max(1, Math.round(w * resolutionScale));
-      const bh = Math.max(1, Math.round(h * resolutionScale));
-      renderer.setSize(bw, bh);
-      canvas.style.width = "100%";
-      canvas.style.height = "100%";
-      // Half the buffer size reproduces the original retina (2x) framing of the pattern.
-      program.uniforms.uResolution.value.set(bw / 2, bh / 2);
-    };
-
-    window.addEventListener("resize", resize);
-    resize();
-
-    const start = performance.now();
     let frame = 0;
-    // The veil drifts slowly, so 30fps looks identical and halves the GPU work.
-    const FRAME_MS = 1000 / 30;
-    let lastRender = -Infinity;
+    let disposed = false;
+    let teardown = () => {};
 
-    const loop = (now) => {
-      frame = requestAnimationFrame(loop);
-      if (now - lastRender < FRAME_MS - 1) return;
-      lastRender = now;
-      program.uniforms.uTime.value =
-        ((performance.now() - start) / 1000) * speed;
-      program.uniforms.uHueShift.value = hueShift;
-      program.uniforms.uNoise.value = noiseIntensity;
-      program.uniforms.uScan.value = scanlineIntensity;
-      program.uniforms.uScanFreq.value = scanlineFrequency;
-      program.uniforms.uWarp.value = warpAmount;
-      renderer.render({ scene: mesh });
+    // Plain WebGL (no library): one full-screen triangle. The shader is compiled with
+    // KHR_parallel_shader_compile where available, so a slow first-visit compile
+    // (notably on Windows) happens in the background instead of freezing the page.
+    const setup = () => {
+      const gl = canvas.getContext("webgl", {
+        alpha: false,
+        antialias: false,
+        depth: false,
+        stencil: false,
+        powerPreference: "low-power",
+      });
+      if (!gl) return;
+
+      const compile = (type, source) => {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        return shader;
+      };
+      const program = gl.createProgram();
+      const vs = compile(gl.VERTEX_SHADER, vertex);
+      const fs = compile(gl.FRAGMENT_SHADER, fragment);
+      gl.attachShader(program, vs);
+      gl.attachShader(program, fs);
+      gl.linkProgram(program);
+
+      const buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+
+      let uniforms = null;
+      const resize = () => {
+        // The veil is a soft gradient, so render a low-res buffer and let the browser upscale it.
+        const bw = Math.max(1, Math.round(parent.clientWidth * resolutionScale));
+        const bh = Math.max(1, Math.round(parent.clientHeight * resolutionScale));
+        canvas.width = bw;
+        canvas.height = bh;
+        gl.viewport(0, 0, bw, bh);
+        // Half the buffer size reproduces the original retina (2x) framing of the pattern.
+        if (uniforms) gl.uniform2f(uniforms.uResolution, bw / 2, bh / 2);
+      };
+
+      const start = performance.now();
+      // The veil drifts slowly, so 30fps looks identical and halves the GPU work.
+      const FRAME_MS = 1000 / 30;
+      let lastRender = -Infinity;
+      let frozen = isLite() || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const draw = () => {
+        gl.uniform1f(uniforms.uTime, ((performance.now() - start) / 1000) * speed);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      };
+      const loop = (now) => {
+        if (frozen) return;
+        frame = requestAnimationFrame(loop);
+        if (now - lastRender < FRAME_MS - 1) return;
+        lastRender = now;
+        draw();
+      };
+
+      const begin = () => {
+        if (disposed || !gl.getProgramParameter(program, gl.LINK_STATUS)) return;
+        gl.useProgram(program);
+        const position = gl.getAttribLocation(program, "position");
+        gl.enableVertexAttribArray(position);
+        gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+        uniforms = Object.fromEntries(
+          ["uTime", "uResolution", "uHueShift", "uNoise", "uScan", "uScanFreq", "uWarp"].map((name) => [
+            name,
+            gl.getUniformLocation(program, name),
+          ]),
+        );
+        gl.uniform1f(uniforms.uHueShift, hueShift);
+        gl.uniform1f(uniforms.uNoise, noiseIntensity);
+        gl.uniform1f(uniforms.uScan, scanlineIntensity);
+        gl.uniform1f(uniforms.uScanFreq, scanlineFrequency);
+        gl.uniform1f(uniforms.uWarp, warpAmount);
+        resize();
+        draw();
+        canvas.classList.add("is-ready");
+        if (!frozen) frame = requestAnimationFrame(loop);
+      };
+
+      const parallel = gl.getExtension("KHR_parallel_shader_compile");
+      const waitForLink = () => {
+        if (disposed) return;
+        if (!parallel || gl.getProgramParameter(program, parallel.COMPLETION_STATUS_KHR)) begin();
+        else frame = requestAnimationFrame(waitForLink);
+      };
+      waitForLink();
+
+      const onResize = () => {
+        if (!uniforms) return;
+        resize();
+        if (frozen) draw();
+      };
+      const onContextLost = (event) => {
+        event.preventDefault();
+        frozen = true;
+        cancelAnimationFrame(frame);
+      };
+      window.addEventListener("resize", onResize);
+      canvas.addEventListener("webglcontextlost", onContextLost);
+      const cancelLite = onLite(() => {
+        frozen = true;
+        cancelAnimationFrame(frame);
+      });
+
+      teardown = () => {
+        cancelLite();
+        window.removeEventListener("resize", onResize);
+        canvas.removeEventListener("webglcontextlost", onContextLost);
+        gl.deleteProgram(program);
+        gl.deleteShader(vs);
+        gl.deleteShader(fs);
+        gl.deleteBuffer(buffer);
+      };
     };
 
-    // Compiling this shader is expensive, so wait until the first paint is done, then fade in.
-    const cancelIdle = afterIdle(() => {
-      frame = requestAnimationFrame((now) => {
-        loop(now);
-        canvas.classList.add("is-ready");
-      });
-    });
+    // Wait until the first paint is done before touching the GPU, then fade in.
+    const cancelIdle = afterIdle(setup);
 
     return () => {
+      disposed = true;
       cancelIdle();
       cancelAnimationFrame(frame);
-      window.removeEventListener("resize", resize);
+      teardown();
     };
   }, [
     hueShift,

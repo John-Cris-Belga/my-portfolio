@@ -16,8 +16,8 @@ const Services = () => (
         className="cursor-target rounded-lg border border-[#1b2c68a0] bg-linear-to-br from-black/55 to-[#0a0d37]/55 p-5 transition-colors duration-300 hover:border-indigo-500/60"
       >
         <Icon className={`h-7 w-7 ${color}`} aria-hidden="true" />
-        <h3 className="mt-4 font-semibold text-white">{title}</h3>
-        <p className="mt-1 text-sm text-gray-400">{text}</p>
+        <h3 className="mt-4 text-lg font-semibold text-white">{title}</h3>
+        <p className="mt-1.5 text-sm leading-relaxed text-gray-400">{text}</p>
       </li>
     ))}
   </ul>

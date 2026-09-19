@@ -1,41 +1,25 @@
-"use client";
-
-import DarkVeil from "@/components/DarkVeil";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import ProfileCard from "@/components/ProfileCard";
 import ElectricBorder from "@/components/ElectricBorder";
 import GradualBlur from "@/components/GradualBlur";
 import CoderProfileCard from "@/components/CoderProfileCard";
-import TechStackSpiral from '@/components/TechStackSpiral';
-import { techStack } from '@/lib/techStack';
-import Shuffle from '@/components/Shuffle';
-import VentureGrid from '@/components/VentureGrid';
-import { projects } from '@/lib/projects';
+import VentureGrid from "@/components/VentureGrid";
+import BorderGlow from "@/components/BorderGlow";
+import ProjectCard from "@/components/ProjectCard";
+import Services from "@/components/Services";
+import ContactFooter from "@/components/ContactFooter";
+import { projects } from "@/lib/projects";
 
-import Services from '@/components/Services';
-import ContactFooter from '@/components/ContactFooter';
-import TargetCursor from '@/components/TargetCursor';
-
-const headingStyle = { fontSize: 'clamp(1.75rem, 8vw, 3.5rem)' };
+// Type scale used across the page (largest to smallest):
+//   h2 section headline · lead text · h3 card title · body · small labels (never dimmer than gray-400).
+// A server component: the static sections ship as HTML with no JavaScript to download or hydrate.
+// Only the interactive pieces (marked "use client") run in the browser.
 
 function SectionHeading({ title, subtitle }: { title: string; subtitle: string }) {
   return (
     <div className="text-center">
-      <Shuffle
-        text={title}
-        tag="h2"
-        style={headingStyle}
-        shuffleDirection="right"
-        duration={0.35}
-        animationMode="evenodd"
-        shuffleTimes={1}
-        ease="power3.out"
-        stagger={0.03}
-        threshold={0.1}
-        triggerOnce={true}
-        triggerOnHover
-        respectReducedMotion={true}
-      />
-      <p className="mt-4 text-sm sm:text-base text-gray-400">{subtitle}</p>
+      <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-balance text-white">{title}</h2>
+      <p className="mt-3 text-base sm:text-lg text-gray-400">{subtitle}</p>
     </div>
   );
 }
@@ -60,20 +44,7 @@ export default function Home() {
         exponential
         opacity={1}
       />
-      <div className="w-full h-150 fixed inset-0">
-        <DarkVeil
-          hueShift={0}
-          noiseIntensity={0}
-          scanlineIntensity={0}
-          speed={1.5}
-          scanlineFrequency={0}
-          warpAmount={0}
-          resolutionScale={0.5}
-        />
-      </div>
-      <div className="pointer-events-none fixed right-0 top-[5vh] h-[90vh] w-full sm:w-1/2">
-        <TechStackSpiral items={techStack} />
-      </div>
+      <BackgroundEffects />
       <div className="relative flex flex-col items-center justify-center lg:flex-row mt-32 sm:mt-36 lg:mt-40 gap-10 lg:gap-12 w-full max-w-300">
         <ElectricBorder
           color="#7df9ff"
@@ -89,19 +60,18 @@ export default function Home() {
               handle="javicodes"
               status="Online"
               contactText="Contact Me"
-              avatarUrl="/my_picture.png"
+              avatarUrl="/profile/chris-portrait.webp"
               avatarUrls={[
-                { src: "/my_picture.png", position: "50% 50%" },
-                { src: "/profile/chris-hoodie.jpg", position: "25% 50%" },
+                { src: "/profile/chris-portrait.webp", position: "50% 50%" },
+                { src: "/profile/chris-hoodie.webp", position: "25% 50%" },
               ]}
               slideInterval={10000}
               showUserInfo={false}
               showName={false}
               enableTilt={true}
               enableMobileTilt={true}
-              onContactClick={() => console.log("Contact clicked")}
               behindGlowColor="rgba(125, 190, 255, 0.67)"
-              iconUrl="/iconpattern.png"
+              iconUrl="/iconpattern.webp"
               behindGlowEnabled
               innerGradient="linear-gradient(145deg,#60496e8c 0%,#71C4FF44 100%)"
             />
@@ -112,16 +82,32 @@ export default function Home() {
         </div>
       </div>
       <section id="services" className="[content-visibility:auto] relative mt-24 sm:mt-32 w-full max-w-300 [contain-intrinsic-size:auto_740px] sm:[contain-intrinsic-size:auto_480px] lg:[contain-intrinsic-size:auto_300px]">
-        <SectionHeading title="SERVICES" subtitle="What I can build for you." />
+        <SectionHeading title="Services" subtitle="What I can build for you." />
         <div className="mt-10">
           <Services />
         </div>
       </section>
-      <section id="ventures" className="relative mt-24 sm:mt-32 w-full max-w-300">
-        <SectionHeading title="VENTURES" subtitle="Companies and products I've co-founded and built." />
+      {/* data-cursor="native": the custom target cursor steps aside here; the tile hover effects stay. */}
+      <section id="ventures" data-cursor="native" className="relative mt-24 sm:mt-32 w-full max-w-300">
+        <SectionHeading title="Ventures" subtitle="Companies and products I've co-founded and built." />
         {/* Extra room around the grid so the skipped-render clip doesn't cut off the card glows. */}
         <div className="[content-visibility:auto] -mx-12 -mb-12 -mt-2 p-12 [contain-intrinsic-size:auto_1610px] md:[contain-intrinsic-size:auto_1100px] lg:[contain-intrinsic-size:auto_590px]">
-          <VentureGrid projects={projects} />
+          <VentureGrid>
+            {projects.map((project) => (
+              <BorderGlow
+                key={project.url}
+                className="venture-card"
+                backgroundColor="#07081a"
+                borderRadius={14}
+                glowRadius={32}
+                glowColor={project.glow}
+                colors={[project.accent, "#c084fc", "#38bdf8"]}
+                style={{ "--accent": project.accent }}
+              >
+                <ProjectCard project={project} />
+              </BorderGlow>
+            ))}
+          </VentureGrid>
         </div>
       </section>
       <div className="[content-visibility:auto] mt-24 sm:mt-32 w-full flex justify-center [contain-intrinsic-size:auto_420px]">
@@ -137,7 +123,6 @@ export default function Home() {
         exponential
         opacity={1}
       />
-      <TargetCursor />
     </main>
   );
 }

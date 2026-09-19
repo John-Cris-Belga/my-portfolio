@@ -5,7 +5,8 @@ import { gsap } from "gsap";
 import "./TargetCursor.css";
 
 // Adapted from React Bits "Target Cursor": site-wide by default (or limited to `scopeRef`),
-// disabled on touch devices, and the spin only runs while visible.
+// disabled on touch devices, and the spin only runs while visible. Inside any element marked
+// data-cursor="native" it hides and the normal system cursor takes over.
 
 const BORDER = 3;
 const CORNER = 12;
@@ -53,6 +54,8 @@ export default function TargetCursor({
     let lastX = 0;
     let lastY = 0;
     let shown = false;
+    let suppressed = false;
+    const NATIVE_ZONE = '[data-cursor="native"]';
 
     scope.classList.add("has-target-cursor");
     gsap.set(cursor, { xPercent: -50, yPercent: -50, autoAlpha: 0 });
@@ -129,8 +132,23 @@ export default function TargetCursor({
       lastX = e.clientX;
       lastY = e.clientY;
       gsap.set(cursor, { x: lastX, y: lastY });
+      if (suppressed) return;
       gsap.to(cursor, { autoAlpha: 1, duration: 0.15 });
       startSpin();
+    };
+    // Hide while over a native-cursor zone, come back when leaving it.
+    const syncZone = (el) => {
+      const inZone = !!el?.closest?.(NATIVE_ZONE);
+      if (inZone === suppressed) return;
+      suppressed = inZone;
+      if (inZone) {
+        release(false);
+        spin?.kill();
+        gsap.to(cursor, { autoAlpha: 0, duration: 0.15 });
+      } else if (shown) {
+        gsap.to(cursor, { autoAlpha: 1, duration: 0.15 });
+        startSpin();
+      }
     };
     const onMove = (e) => {
       // The pointer may already be inside the scope on load, when no pointerenter fires.
@@ -146,13 +164,17 @@ export default function TargetCursor({
       gsap.to(cursor, { autoAlpha: 0, duration: 0.15 });
     };
     const onOver = (e) => {
+      syncZone(e.target);
+      if (suppressed) return;
       const target = e.target.closest?.(targetSelector);
       if (target && scope.contains(target)) lock(target);
       else release();
     };
     const onScroll = () => {
-      if (!activeTarget) return;
-      const target = document.elementFromPoint(lastX, lastY)?.closest(targetSelector);
+      const under = shown ? document.elementFromPoint(lastX, lastY) : null;
+      if (under) syncZone(under);
+      if (!activeTarget || suppressed) return;
+      const target = under?.closest(targetSelector);
       if (target === activeTarget) measure(target);
       else if (target && scope.contains(target)) {
         release(false);

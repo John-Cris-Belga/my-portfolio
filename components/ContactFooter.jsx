@@ -8,8 +8,8 @@ const socials = [
 
 const ContactFooter = () => (
   <footer id="contact" className="relative w-full max-w-300 pb-28 sm:pb-36 text-center">
-    <h2 className="text-2xl sm:text-4xl font-semibold text-white">Have a project in mind?</h2>
-    <p className="mt-3 text-sm sm:text-base text-gray-400">Let&apos;s build it together.</p>
+    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-balance text-white">Have a project in mind?</h2>
+    <p className="mt-3 text-base sm:text-lg text-gray-400">Let&apos;s build it together.</p>
 
     <a
       href={`mailto:${site.email}`}
@@ -19,7 +19,7 @@ const ContactFooter = () => (
       {site.email}
     </a>
 
-    <div className="mt-6 flex justify-center gap-4">
+    <div className="mt-6 flex justify-center gap-2">
       {socials.map(({ label, href, icon: Icon }) => (
         <a
           key={label}
@@ -27,14 +27,14 @@ const ContactFooter = () => (
           target="_blank"
           rel="noopener noreferrer"
           aria-label={label}
-          className="cursor-target rounded-md p-1.5 text-gray-400 transition hover:text-white"
+          className="cursor-target rounded-md p-2.5 text-gray-400 transition hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400"
         >
           <Icon className="h-6 w-6" aria-hidden="true" />
         </a>
       ))}
     </div>
 
-    <p className="mt-12 text-xs text-gray-500">© {new Date().getFullYear()} {site.name}</p>
+    <p className="mt-12 text-xs text-gray-400">© {new Date().getFullYear()} {site.name}</p>
   </footer>
 );
 

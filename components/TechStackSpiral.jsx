@@ -1,9 +1,12 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { afterIdle } from "@/lib/afterIdle";
+import { onLite } from "@/lib/perfMode";
 import "./TechStackSpiral.css";
 
-// Adapted from React Bits "Infinite Spiral" to render icon items as a non-interactive background.
+// Adapted from React Bits "Infinite Spiral" as a non-interactive background. Every tile follows
+// the same helix path, so the path is baked into one set of keyframes and each tile plays it
+// with a different phase. The browser runs these on the compositor: no per-frame JavaScript.
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 const modulo = (value, divisor) => ((value % divisor) + divisor) % divisor;
@@ -11,6 +14,8 @@ const smoothstep = (min, max, value) => {
   const x = clamp((value - min) / (max - min || 1), 0, 1);
   return x * x * (3 - 2 * x);
 };
+
+const KEYFRAME_STEPS = 80;
 
 const TechStackSpiral = ({
   items,
@@ -29,101 +34,96 @@ const TechStackSpiral = ({
 }) => {
   const rootRef = useRef(null);
   const cardRefs = useRef([]);
+  const count = items.length;
 
   useEffect(() => {
     const root = rootRef.current;
-    if (!root || items.length === 0) return;
+    if (!root || count === 0) return;
 
-    let frameId;
-    let previousTime = performance.now();
-    let progress = 0;
-    let visible = true;
-    let laidOut = false;
-    const zIndices = [];
-    let bounds = root.getBoundingClientRect();
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const half = count / 2;
+    const duration = (count / Math.max(speed, 0.01)) * 1000;
+    let animations = [];
+    let paused = reducedMotion;
+    let ready = false;
+    let rebuildFrame = 0;
 
-    const resizeObserver = new ResizeObserver(() => {
-      bounds = root.getBoundingClientRect();
-      laidOut = false;
-    });
-    resizeObserver.observe(root);
+    const build = () => {
+      const elapsed = animations[0]?.currentTime ?? 0;
+      animations.forEach((a) => a.cancel());
 
-    const intersectionObserver = new IntersectionObserver(
-      ([entry]) => {
-        visible = entry.isIntersecting;
-      },
-      { threshold: 0.02 },
-    );
-    intersectionObserver.observe(root);
-
-    const render = (time) => {
-      const delta = Math.min((time - previousTime) / 1000, 0.05);
-      previousTime = time;
-
-      if (!visible || reducedMotion.matches) {
-        if (laidOut) {
-          frameId = requestAnimationFrame(render);
-          return;
-        }
-      } else {
-        progress += speed * (direction === "down" ? -1 : 1) * delta;
-      }
-      laidOut = true;
-
-      const count = items.length;
-      const half = count / 2;
+      const bounds = root.getBoundingClientRect();
       const width = Math.max(bounds.width, 1);
       const height = Math.max(bounds.height, 1);
       const fit = Math.min(1, width / (cardWidth * 2.8), height / (cardHeight * 2.35));
-      const responsiveRadius = Math.min(radius, Math.max(72, width * 0.36)) * fit;
+      const helixRadius = Math.min(radius, Math.max(72, width * 0.36)) * fit;
       const fadeStart = clamp(1 - edgeFade, 0, 0.98);
       const turnSize = Math.max(cardsPerTurn, 1);
       // Spread the loop across the full container height instead of a fixed spacing.
       const spacing = Math.max(verticalSpacing * fit, height / count);
 
-      cardRefs.current.forEach((card, index) => {
-        if (!card) return;
-        const offset = modulo(index - progress + half, count) - half;
-
+      const keyframes = [];
+      for (let s = 0; s <= KEYFRAME_STEPS; s++) {
+        const p = s / KEYFRAME_STEPS;
+        const offset = half - p * count;
         const edge = Math.min(Math.abs(offset) / Math.max(half, 1), 1);
-        const opacity = 1 - smoothstep(fadeStart, 1, edge);
         const focus = 1 - Math.min(Math.abs(offset) / Math.max(turnSize * 0.65, 1), 1);
-        const scale = (1 + (centerScale - 1) * focus) * fit;
-        const angleRadians = (offset * (360 / turnSize) * Math.PI) / 180;
-        const x = Math.sin(angleRadians) * responsiveRadius;
-        const z = Math.cos(angleRadians) * responsiveRadius;
+        const angle = (offset * (360 / turnSize) * Math.PI) / 180;
+        const x = Math.sin(angle) * helixRadius;
+        const z = Math.cos(angle) * helixRadius;
         const depthScale = clamp(perspective / Math.max(perspective - z, 1), 0.72, 1.45);
-        const depth = (z / Math.max(responsiveRadius, 1) + 1) / 2;
+        const scale = (1 + (centerScale - 1) * focus) * fit * depthScale;
+        keyframes.push({
+          offset: p,
+          // z only orders the tiles front-to-back (the stage is preserve-3d with no perspective).
+          transform: `translate3d(${x.toFixed(1)}px, ${(offset * spacing).toFixed(1)}px, ${z.toFixed(1)}px) scale(${scale.toFixed(3)})`,
+          opacity: (1 - smoothstep(fadeStart, 1, edge)).toFixed(3),
+        });
+      }
 
-        // Only transform and opacity change per frame so tiles stay on the compositor.
-        card.style.transform = `translate3d(calc(-50% + ${x.toFixed(1)}px), calc(-50% + ${(offset * spacing).toFixed(1)}px), 0) scale(${(scale * depthScale).toFixed(3)})`;
-        card.style.opacity = opacity.toFixed(2);
-        // Re-stacking layers is expensive, so only touch z-index when the depth bucket changes.
-        const zIndex = Math.round(depth * count) * 100 + index;
-        if (zIndices[index] !== zIndex) {
-          zIndices[index] = zIndex;
-          card.style.zIndex = String(zIndex);
-        }
+      animations = cardRefs.current.slice(0, count).flatMap((card, index) => {
+        // A tile can be briefly unmounted (e.g. during a hot reload); skip it rather than throw.
+        if (!card) return [];
+        const startOffset = modulo(index + half, count) - half;
+        const animation = card.animate(keyframes, {
+          duration,
+          iterations: Infinity,
+          iterationStart: (half - startOffset) / count,
+          direction: direction === "down" ? "reverse" : "normal",
+          fill: "both",
+        });
+        animation.currentTime = elapsed;
+        if (paused) animation.pause();
+        return [animation];
       });
-
-      frameId = requestAnimationFrame(render);
     };
 
+    const resizeObserver = new ResizeObserver(() => {
+      if (!ready) return;
+      cancelAnimationFrame(rebuildFrame);
+      rebuildFrame = requestAnimationFrame(build);
+    });
+    resizeObserver.observe(root);
+
     const cancelIdle = afterIdle(() => {
-      previousTime = performance.now();
-      frameId = requestAnimationFrame(render);
+      build();
+      ready = true;
       root.classList.add("is-ready");
     }, 300);
+    const cancelLite = onLite(() => {
+      paused = true;
+      animations.forEach((a) => a.pause());
+    });
 
     return () => {
       cancelIdle();
-      cancelAnimationFrame(frameId);
+      cancelLite();
+      cancelAnimationFrame(rebuildFrame);
       resizeObserver.disconnect();
-      intersectionObserver.disconnect();
+      animations.forEach((a) => a.cancel());
     };
   }, [
-    items,
+    count,
     speed,
     direction,
     radius,
@@ -137,11 +137,7 @@ const TechStackSpiral = ({
   ]);
 
   return (
-    <div
-      ref={rootRef}
-      className={`tech-spiral ${className}`.trim()}
-      aria-hidden="true"
-    >
+    <div ref={rootRef} className={`tech-spiral ${className}`.trim()} aria-hidden="true">
       <div className="tech-spiral__stage">
         {items.map(({ label, icon: Icon, color }, index) => (
           <div
@@ -150,7 +146,14 @@ const TechStackSpiral = ({
               cardRefs.current[index] = node;
             }}
             className="tech-spiral__item"
-            style={{ width: cardWidth, height: cardHeight, borderRadius: cardRadius, color }}
+            style={{
+              width: cardWidth,
+              height: cardHeight,
+              marginLeft: -cardWidth / 2,
+              marginTop: -cardHeight / 2,
+              borderRadius: cardRadius,
+              color,
+            }}
           >
             <Icon className="tech-spiral__icon" />
           </div>

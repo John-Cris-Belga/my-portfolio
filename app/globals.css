@@ -135,3 +135,9 @@
         @apply font-sans;
     }
 }
+
+/* Lite mode (set by lib/perfMode on devices that can't hold a smooth frame rate):
+   drop the edge blurs, which re-blur whatever moves beneath them on every frame. */
+[data-perf="lite"] .gradual-blur {
+    display: none;
+}

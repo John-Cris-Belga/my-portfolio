@@ -8,14 +8,9 @@ const ProjectCard = ({ project }) => {
       href={project.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="cursor-target group flex h-full flex-col overflow-hidden rounded-[inherit] bg-[radial-gradient(120%_70%_at_0%_0%,color-mix(in_srgb,var(--accent,#6366f1)_22%,transparent),transparent_65%)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400"
+      className="group flex h-full flex-col overflow-hidden rounded-[inherit] bg-[radial-gradient(120%_70%_at_0%_0%,color-mix(in_srgb,var(--accent,#6366f1)_22%,transparent),transparent_65%)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400"
     >
-      <div className="flex items-center gap-3 bg-black/40 px-4 py-3">
-        <div className="flex gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
-          <span className="h-2.5 w-2.5 rounded-full bg-orange-400" />
-          <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
-        </div>
+      <div className="flex items-center bg-black/40 px-4 py-3">
         <span className="truncate rounded-md bg-white/5 px-2 py-0.5 font-mono text-xs text-gray-400">
           {host}
         </span>

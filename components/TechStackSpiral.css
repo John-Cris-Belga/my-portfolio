@@ -17,6 +17,8 @@
 .tech-spiral__stage {
   position: absolute;
   inset: 0;
+  /* Lets the browser sort tiles front-to-back by their translateZ, on the GPU. */
+  transform-style: preserve-3d;
 }
 
 .tech-spiral__item {
@@ -28,6 +30,8 @@
   justify-content: center;
   border: 1px solid rgb(255 255 255 / 0.24);
   background: rgb(255 255 255 / 0.08);
+  opacity: 0;
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   will-change: transform, opacity;
 }

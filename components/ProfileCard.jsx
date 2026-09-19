@@ -1,6 +1,8 @@
 "use client";
 import React, { useEffect, useRef, useCallback, useMemo } from "react";
 import AvatarMorph from "./AvatarMorph";
+import { afterIdle } from "@/lib/afterIdle";
+import { isLite } from "@/lib/perfMode";
 import "./ProfileCard.css";
 
 const DEFAULT_INNER_GRADIENT =
@@ -286,14 +288,22 @@ const ProfileCardComponent = ({
     };
     shell.addEventListener("click", handleClick);
 
-    const initialX =
-      (shell.clientWidth || 0) - ANIMATION_CONFIG.INITIAL_X_OFFSET;
-    const initialY = ANIMATION_CONFIG.INITIAL_Y_OFFSET;
-    tiltEngine.setImmediate(initialX, initialY);
-    tiltEngine.toCenter();
-    tiltEngine.beginInitial(ANIMATION_CONFIG.INITIAL_DURATION);
+    // Rest at center for the first paint. The intro shine sweep repaints every blend layer of the
+    // card each frame, so it runs after the page is idle instead of competing with page load.
+    tiltEngine.setImmediate(shell.clientWidth / 2, shell.clientHeight / 2);
+    const cancelIntro = afterIdle(() => {
+      const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches || isLite();
+      if (still || shell.classList.contains("active")) return;
+      tiltEngine.setImmediate(
+        (shell.clientWidth || 0) - ANIMATION_CONFIG.INITIAL_X_OFFSET,
+        ANIMATION_CONFIG.INITIAL_Y_OFFSET,
+      );
+      tiltEngine.toCenter();
+      tiltEngine.beginInitial(ANIMATION_CONFIG.INITIAL_DURATION);
+    }, 1500);
 
     return () => {
+      cancelIntro();
       shell.removeEventListener("pointerenter", pointerEnterHandler);
       shell.removeEventListener("pointermove", pointerMoveHandler);
       shell.removeEventListener("pointerleave", pointerLeaveHandler);

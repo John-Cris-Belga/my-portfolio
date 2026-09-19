@@ -1,16 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Inter, Press_Start_2P } from "next/font/google";
+import { Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { buildJsonLd, site } from "@/lib/site";
-
-// Only the section headings (below the fold) use this font, so don't preload it.
-const pressStart2P = Press_Start_2P({
-  weight: '400',
-  subsets: ['latin'],
-  variable: '--font-press-start',
-  preload: false,
-})
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -75,14 +67,16 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", pressStart2P.className, geistMono.variable, "font-sans", inter.variable)}
+      suppressHydrationWarning
+      className={cn("h-full", "antialiased", geistMono.variable, "font-sans", inter.variable)}
     >
       <body className="min-h-full flex flex-col">
-        {/* Runs before load so the browser never restores a mid-page scroll on refresh; #anchors still work. */}
+        {/* Runs before load: never restore a mid-page scroll on refresh (#anchors still work), and
+            re-apply lite mode if this device already proved too slow for the effects this session. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "if('scrollRestoration' in history)history.scrollRestoration='manual';if(!location.hash)window.scrollTo(0,0);",
+              "if('scrollRestoration' in history)history.scrollRestoration='manual';if(!location.hash)window.scrollTo(0,0);try{if(sessionStorage.getItem('perf-lite'))document.documentElement.dataset.perf='lite'}catch(e){}",
           }}
         />
         <script

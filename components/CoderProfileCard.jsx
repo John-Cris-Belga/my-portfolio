@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
+import { afterIdle } from "@/lib/afterIdle";
 
 const coderData = {
   name: "Chris Belga",
@@ -105,7 +106,7 @@ const rowLength = (row) => row.segments.reduce((sum, s) => sum + s.text.length, 
 
 const TYPING_SPEED = 22;
 const ROW_DELAY = 140;
-const INITIAL_DELAY = 500;
+const INITIAL_DELAY = 200;
 
 function TypedRow({ row, chars, complete }) {
   let remaining = chars;
@@ -120,7 +121,7 @@ function TypedRow({ row, chars, complete }) {
         <a
           key={i}
           href={seg.href}
-          className={`cursor-target ${seg.cls} hover:underline`}
+          className={`cursor-target ${seg.cls} rounded-sm hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400`}
           {...(seg.download
             ? { download: true }
             : seg.href.startsWith("http")
@@ -155,6 +156,35 @@ const Cursor = ({ blink }) => (
   />
 );
 
+// Memoized: while typing, only the row being typed re-renders; finished rows are skipped.
+const TerminalRow = memo(function TerminalRow({ row, number, chars, complete, cursor }) {
+  return (
+    <div className="flex leading-relaxed">
+      <LineNumber n={number} className="invisible" />
+      <div className={`min-w-0 flex-1 break-words ${row.indent}`}>
+        <TypedRow row={row} chars={chars} complete={complete} />
+        {cursor === "typing" && <Cursor />}
+        {cursor === "blink" && <Cursor blink />}
+      </div>
+    </div>
+  );
+});
+
+// Invisible full copy that reserves the final height (and shows the line numbers) so the card
+// doesn't grow while typing. A module-level element, so React never re-renders it.
+const RESERVED_LAYOUT = (
+  <code aria-hidden="true" className="invisible block">
+    {ROWS.map((row, i) => (
+      <div key={i} className="flex leading-relaxed">
+        <LineNumber n={i + 1} className="visible" />
+        <div className={`min-w-0 flex-1 break-words ${row.indent}`}>
+          <TypedRow row={row} chars={rowLength(row)} complete={false} />
+        </div>
+      </div>
+    ))}
+  </code>
+);
+
 const CoderProfileCard = () => {
   const containerRef = useRef(null);
   const [phase, setPhase] = useState("idle");
@@ -164,6 +194,7 @@ const CoderProfileCard = () => {
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
+    let cancelStart = () => {};
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
@@ -173,12 +204,16 @@ const CoderProfileCard = () => {
           setPhase("done");
           return;
         }
-        setTimeout(() => setPhase("typing"), INITIAL_DELAY);
+        // Start once the page is idle so typing never competes with page load.
+        cancelStart = afterIdle(() => setPhase("typing"), INITIAL_DELAY);
       },
       { threshold: 0.2 },
     );
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      cancelStart();
+    };
   }, []);
 
   useEffect(() => {
@@ -228,35 +263,21 @@ const CoderProfileCard = () => {
         <div className="pointer-events-none absolute -top-40 -left-40 h-96 w-96 bg-[radial-gradient(circle,rgba(37,99,235,0.1)_0%,transparent_60%)]"></div>
         <div className="pointer-events-none absolute -bottom-40 -right-40 h-96 w-96 bg-[radial-gradient(circle,rgba(219,39,119,0.1)_0%,transparent_60%)]"></div>
 
-        {/* Invisible full copy reserves the final height (and shows the line numbers) so the card doesn't grow while typing. */}
         <div className="relative w-full min-w-0 font-mono text-xs sm:text-sm lg:text-base">
-          <code aria-hidden="true" className="invisible block">
-            {ROWS.map((row, i) => (
-              <div key={i} className="flex leading-relaxed">
-                <LineNumber n={i + 1} className="visible" />
-                <div className={`min-w-0 flex-1 break-words ${row.indent}`}>
-                  <TypedRow row={row} chars={rowLength(row)} complete={false} />
-                </div>
-              </div>
-            ))}
-          </code>
+          {RESERVED_LAYOUT}
           <code className="absolute inset-0 block">
             {ROWS.map((row, i) => {
               if (i > rowIndex || phase === "idle") return null;
               const complete = i < rowIndex || done;
               return (
-                <div key={i} className="flex leading-relaxed">
-                  <LineNumber n={i + 1} className="invisible" />
-                  <div className={`min-w-0 flex-1 break-words ${row.indent}`}>
-                    <TypedRow
-                      row={row}
-                      chars={complete ? rowLength(row) : charIndex}
-                      complete={complete}
-                    />
-                    {typing && i === rowIndex && <Cursor />}
-                    {done && i === ROWS.length - 1 && <Cursor blink />}
-                  </div>
-                </div>
+                <TerminalRow
+                  key={i}
+                  row={row}
+                  number={i + 1}
+                  chars={complete ? rowLength(row) : charIndex}
+                  complete={complete}
+                  cursor={typing && i === rowIndex ? "typing" : done && i === ROWS.length - 1 ? "blink" : null}
+                />
               );
             })}
           </code>
@@ -264,7 +285,7 @@ const CoderProfileCard = () => {
       </div>
 
       {/* Equal side columns keep the middle item centered while the Ln/Col text changes width. */}
-      <div className="px-4 lg:px-8 pb-4 mt-4 border-t border-gray-800 pt-3 text-xs text-gray-500 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+      <div className="px-4 lg:px-8 pb-4 mt-4 border-t border-gray-800 pt-3 text-xs text-gray-400 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <span className="justify-self-start">UTF-8</span>
         <span className="flex items-center gap-1.5 whitespace-nowrap">
           <span className="relative flex h-2 w-2">
