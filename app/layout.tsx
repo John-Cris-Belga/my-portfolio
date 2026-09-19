@@ -81,6 +81,13 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", geistSans.variable, pressStart2P.className, geistMono.variable, "font-sans", inter.variable)}
     >
       <body className="min-h-full flex flex-col">
+        {/* Runs before load so the browser never restores a mid-page scroll on refresh; #anchors still work. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "if('scrollRestoration' in history)history.scrollRestoration='manual';if(!location.hash)window.scrollTo(0,0);",
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
