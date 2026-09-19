@@ -8,7 +8,7 @@ export const site = {
   shortDescription:
     "Web developer and HubSpot admin from Bicol, Philippines. Building web apps with React, Next.js, and Node.js — and the startups Eduble, Reviewlution, and Arvotech.",
   description:
-    "Chris Belga is a full-stack web developer and HubSpot admin based in Bicol, Philippines. A mechanical engineer turned software developer, he builds web apps with React, Next.js, and Node.js, and is the builder behind Eduble, Reviewlution, and Arvotech IT Solutions. Available for projects.",
+    "Chris Belga is a full-stack web developer and HubSpot admin based in Bicol, Philippines, with 6 years of experience. A mechanical engineer turned software developer, he builds web apps with React, Next.js, and Node.js, and is the builder behind Eduble, Reviewlution, and Arvotech IT Solutions. Available for projects.",
   jobTitles: ["Web Developer", "HubSpot Admin"],
   email: "inquiry@chrisbelga.dev",
   location: { region: "Bicol", country: "PH", countryName: "Philippines" },

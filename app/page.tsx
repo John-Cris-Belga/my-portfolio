@@ -111,7 +111,7 @@ export default function Home() {
           <CoderProfileCard />
         </div>
       </div>
-      <section id="services" className="relative mt-24 sm:mt-32 w-full max-w-300">
+      <section id="services" className="[content-visibility:auto] relative mt-24 sm:mt-32 w-full max-w-300 [contain-intrinsic-size:auto_740px] sm:[contain-intrinsic-size:auto_480px] lg:[contain-intrinsic-size:auto_300px]">
         <SectionHeading title="SERVICES" subtitle="What I can build for you." />
         <div className="mt-10">
           <Services />
@@ -119,11 +119,12 @@ export default function Home() {
       </section>
       <section id="ventures" className="relative mt-24 sm:mt-32 w-full max-w-300">
         <SectionHeading title="VENTURES" subtitle="Companies and products I've co-founded and built." />
-        <div className="mt-10">
+        {/* Extra room around the grid so the skipped-render clip doesn't cut off the card glows. */}
+        <div className="[content-visibility:auto] -mx-12 -mb-12 -mt-2 p-12 [contain-intrinsic-size:auto_1610px] md:[contain-intrinsic-size:auto_1100px] lg:[contain-intrinsic-size:auto_590px]">
           <VentureGrid projects={projects} />
         </div>
       </section>
-      <div className="mt-24 sm:mt-32 w-full flex justify-center">
+      <div className="[content-visibility:auto] mt-24 sm:mt-32 w-full flex justify-center [contain-intrinsic-size:auto_420px]">
         <ContactFooter />
       </div>
       <GradualBlur

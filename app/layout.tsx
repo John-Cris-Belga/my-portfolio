@@ -4,10 +4,12 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { buildJsonLd, site } from "@/lib/site";
 
+// Only the section headings (below the fold) use this font, so don't preload it.
 const pressStart2P = Press_Start_2P({
-  weight: '400', // Press Start 2P only has one weight
+  weight: '400',
   subsets: ['latin'],
-  variable: '--font-press-start', // optional, for CSS var usage
+  variable: '--font-press-start',
+  preload: false,
 })
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
