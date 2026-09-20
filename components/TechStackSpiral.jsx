@@ -62,10 +62,10 @@ const TechStackSpiral = ({
       // Spread the loop across the full container height instead of a fixed spacing.
       const spacing = Math.max(verticalSpacing * fit, height / count);
 
-      const keyframes = [];
-      for (let s = 0; s <= KEYFRAME_STEPS; s++) {
-        const p = s / KEYFRAME_STEPS;
-        const offset = half - p * count;
+      // One tile's position at loop position `t` (0..1). Both ends of the loop are faded out,
+      // so the wrap is invisible.
+      const frameAt = (t) => {
+        const offset = half - t * count;
         const edge = Math.min(Math.abs(offset) / Math.max(half, 1), 1);
         const focus = 1 - Math.min(Math.abs(offset) / Math.max(turnSize * 0.65, 1), 1);
         const angle = (offset * (360 / turnSize) * Math.PI) / 180;
@@ -73,22 +73,29 @@ const TechStackSpiral = ({
         const z = Math.cos(angle) * helixRadius;
         const depthScale = clamp(perspective / Math.max(perspective - z, 1), 0.72, 1.45);
         const scale = (1 + (centerScale - 1) * focus) * fit * depthScale;
-        keyframes.push({
-          offset: p,
+        return {
           // z only orders the tiles front-to-back (the stage is preserve-3d with no perspective).
           transform: `translate3d(${x.toFixed(1)}px, ${(offset * spacing).toFixed(1)}px, ${z.toFixed(1)}px) scale(${scale.toFixed(3)})`,
           opacity: (1 - smoothstep(fadeStart, 1, edge)).toFixed(3),
-        });
-      }
+        };
+      };
 
       animations = cardRefs.current.slice(0, count).flatMap((card, index) => {
         // A tile can be briefly unmounted (e.g. during a hot reload); skip it rather than throw.
         if (!card) return [];
+        // Each tile's place in the loop is baked into its own keyframes. Offsetting playback
+        // instead (iterationStart / negative delay) is unreliable: Safari ignores iterationStart
+        // on GPU-accelerated animations, which stacks every tile in one spot.
         const startOffset = modulo(index + half, count) - half;
+        const phase = (half - startOffset) / count;
+        const keyframes = [];
+        for (let s = 0; s <= KEYFRAME_STEPS; s++) {
+          const t = s / KEYFRAME_STEPS;
+          keyframes.push({ offset: t, ...frameAt((t + phase) % 1) });
+        }
         const animation = card.animate(keyframes, {
           duration,
           iterations: Infinity,
-          iterationStart: (half - startOffset) / count,
           direction: direction === "down" ? "reverse" : "normal",
           fill: "both",
         });
