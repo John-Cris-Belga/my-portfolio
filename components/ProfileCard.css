@@ -26,15 +26,18 @@
   touch-action: pan-y;
 }
 
+/* Glow behind the card. It follows the pointer by moving (transform), not by redrawing a
+   blurred gradient every frame, which is what made taps lag on phones. */
 .pc-behind {
   position: absolute;
-  inset: 0;
+  inset: -15%;
   z-index: 0;
   pointer-events: none;
-  background: radial-gradient(circle at var(--pointer-x) var(--pointer-y),
+  background: radial-gradient(circle at center,
       var(--behind-glow-color) 0%,
       transparent var(--behind-glow-size));
-  filter: blur(50px) saturate(1.1);
+  transform: translate3d(calc((var(--pointer-from-left) - 0.5) * 60%),
+      calc((var(--pointer-from-top) - 0.5) * 60%), 0);
   opacity: calc(0.8 * var(--card-opacity));
   transition: opacity 200ms ease;
 }
@@ -52,7 +55,7 @@
   border-radius: var(--card-radius);
   position: relative;
   background-blend-mode: color-dodge, normal, normal, normal;
-  box-shadow: rgba(0, 0, 0, 0.8) calc((var(--pointer-from-left) * 10px) - 3px) calc((var(--pointer-from-top) * 20px) - 6px) 20px -5px;
+  box-shadow: rgba(0, 0, 0, 0.8) 2px 4px 20px -5px;
   transition: transform 1s ease;
   transform: translateZ(0) rotateX(0deg) rotateY(0deg);
   background: rgba(0, 0, 0, 0.9);
@@ -136,15 +139,28 @@
   opacity: 0.28;
 }
 
+/* Glare: a still edge vignette (painted once) plus a soft highlight that slides with the
+   tilt using transform only. No blend mode or filter, so tilting never forces a repaint. */
 .pc-glare {
+  position: relative;
   transform: translate3d(0, 0, 1.1px);
   overflow: hidden;
-  background-image: radial-gradient(farthest-corner circle at var(--pointer-x) var(--pointer-y),
-      hsl(248, 25%, 80%) 12%,
-      hsla(207, 40%, 30%, 0.8) 90%);
-  mix-blend-mode: overlay;
-  filter: brightness(0.8) contrast(1.2);
+  background-image: radial-gradient(farthest-corner circle at 50% 50%,
+      transparent 45%,
+      hsla(220, 45%, 8%, 0.35) 100%);
   z-index: 4;
+}
+
+.pc-glare::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background: radial-gradient(circle at center,
+      hsla(248, 40%, 85%, 0.16) 0%,
+      transparent 35%);
+  transform: translate3d(calc((var(--pointer-from-left) - 0.5) * 50%),
+      calc((var(--pointer-from-top) - 0.5) * 50%), 0);
+  will-change: transform;
 }
 
 .pc-avatar-content {

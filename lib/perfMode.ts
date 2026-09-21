@@ -26,8 +26,9 @@ function setLite() {
 }
 
 /**
- * Watches real frame times once the effects are running. If the page can't hold ~40fps,
- * switches to lite mode. Checks a few times, since lag can show up late (thermal throttling).
+ * Watches real frame times once the effects are running. If the page can't hold ~40fps in two
+ * checks, switches to lite mode. One slow check isn't enough: a short burst (a flurry of taps, a
+ * notification sliding in) shouldn't freeze the effects for the rest of the visit.
  */
 export function startPerfGovernor(): () => void {
   try {
@@ -38,7 +39,8 @@ export function startPerfGovernor(): () => void {
   let raf = 0;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let stopped = false;
-  const windows = [2000, 8000, 20000];
+  const windows = [2000, 8000, 20000, 40000];
+  let slowChecks = 0;
 
   const sample = (index: number) => {
     const deltas: number[] = [];
@@ -60,8 +62,13 @@ export function startPerfGovernor(): () => void {
         const avg = deltas.reduce((a, b) => a + b, 0) / deltas.length;
         const slow = deltas.filter((d) => d > 34).length / deltas.length;
         if (avg > 25 || slow > 0.2) {
-          setLite();
-          return;
+          slowChecks += 1;
+          if (slowChecks >= 2) {
+            setLite();
+            return;
+          }
+        } else {
+          slowChecks = 0;
         }
       }
       if (index + 1 < windows.length) {
