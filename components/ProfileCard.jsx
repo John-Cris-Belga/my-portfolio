@@ -26,6 +26,7 @@ const ProfileCardComponent = ({
   avatarUrl = "<Placeholder for avatar URL>",
   avatarUrls,
   slideInterval = 10000,
+  iconUrl = "",
   grainUrl = "<Placeholder for grain URL>",
   innerGradient,
   behindGlowEnabled = true,
@@ -325,12 +326,13 @@ const ProfileCardComponent = ({
 
   const cardStyle = useMemo(
     () => ({
+      "--icon": iconUrl ? `url(${iconUrl})` : "none",
       "--grain": grainUrl ? `url(${grainUrl})` : "none",
       "--inner-gradient": innerGradient ?? DEFAULT_INNER_GRADIENT,
       "--behind-glow-color": behindGlowColor ?? "rgba(125, 190, 255, 0.67)",
       "--behind-glow-size": behindGlowSize ?? "50%",
     }),
-    [grainUrl, innerGradient, behindGlowColor, behindGlowSize],
+    [iconUrl, grainUrl, innerGradient, behindGlowColor, behindGlowSize],
   );
 
   const handleContactClick = useCallback(() => {
@@ -347,6 +349,7 @@ const ProfileCardComponent = ({
       <div ref={shellRef} className="pc-card-shell">
         <section className="pc-card">
           <div className="pc-inside">
+            <div className="pc-shine" />
             <div className="pc-glare" />
             <div className="pc-content pc-avatar-content">
               <AvatarMorph

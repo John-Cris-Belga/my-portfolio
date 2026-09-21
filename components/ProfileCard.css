@@ -10,6 +10,7 @@
   --background-x: 50%;
   --background-y: 50%;
   --grain: none;
+  --icon: none;
   --behind-gradient: none;
   --behind-glow-color: rgba(125, 190, 255, 0.67);
   --behind-glow-size: 25%;
@@ -89,6 +90,50 @@
   background-image: var(--inner-gradient);
   background-color: rgba(0, 0, 0, 0.9);
   transform: none;
+}
+
+/* Holographic icon sheen. Kept cheap on purpose: the icon mask never moves (so it is painted
+   once), the rainbow underneath slides with the tilt using transform only (GPU, no repaint),
+   and there are no filters or blend modes, which were what made phones lag. */
+.pc-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  -webkit-mask-image: var(--icon);
+  mask-image: var(--icon);
+  -webkit-mask-size: 150%;
+  mask-size: 150%;
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  opacity: 0.14;
+  transition: opacity 0.6s ease;
+  transform: translate3d(0, 0, 1px);
+}
+
+.pc-shine::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background: linear-gradient(115deg,
+      hsl(2, 100%, 73%),
+      hsl(53, 100%, 69%),
+      hsl(93, 100%, 69%),
+      hsl(176, 100%, 76%),
+      hsl(228, 100%, 74%),
+      hsl(283, 100%, 73%),
+      hsl(2, 100%, 73%),
+      hsl(53, 100%, 69%),
+      hsl(93, 100%, 69%));
+  transform: translate3d(calc((0.5 - var(--pointer-from-left)) * 30%),
+      calc((0.5 - var(--pointer-from-top)) * 30%), 0);
+  will-change: transform;
+}
+
+.pc-card-shell.active .pc-shine {
+  opacity: 0.28;
 }
 
 .pc-glare {

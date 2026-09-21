@@ -67,6 +67,7 @@ export default function Home() {
               ]}
               slideInterval={10000}
               showUserInfo={false}
+              iconUrl="/iconpattern.webp"
               showName={false}
               enableTilt={true}
               enableMobileTilt={true}
