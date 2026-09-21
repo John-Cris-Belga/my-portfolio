@@ -51,6 +51,7 @@ export default function AvatarMorph({
           alt={label}
           fetchPriority="high"
           decoding="async"
+          draggable={false}
           style={first.position ? { objectPosition: first.position } : undefined}
         />
       )}

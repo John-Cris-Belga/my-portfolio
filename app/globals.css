@@ -141,3 +141,15 @@
 [data-perf="lite"] .gradual-blur {
     display: none;
 }
+
+/* Decorative visuals: a long press shouldn't select them (iOS paints the whole hero blue with
+   a drag handle) or open the save-image menu. The terminal text stays selectable. */
+.pc-card-wrapper,
+.electric-border,
+.tech-spiral,
+.darkveil-canvas {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
