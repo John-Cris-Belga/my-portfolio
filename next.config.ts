@@ -9,10 +9,6 @@ const nextConfig: NextConfig = {
         source: "/:dir(profile|projects)/:file*",
         headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
       },
-      {
-        source: "/iconpattern.webp",
-        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
-      },
     ];
   },
 };

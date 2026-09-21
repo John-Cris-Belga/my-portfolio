@@ -71,7 +71,6 @@ export default function Home() {
               enableTilt={true}
               enableMobileTilt={true}
               behindGlowColor="rgba(125, 190, 255, 0.67)"
-              iconUrl="/iconpattern.webp"
               behindGlowEnabled
               innerGradient="linear-gradient(145deg,#60496e8c 0%,#71C4FF44 100%)"
             />
