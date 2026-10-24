@@ -71,7 +71,11 @@ export function buildJsonLd() {
               url: p.url,
               description: p.description,
               applicationCategory: "EducationalApplication",
-              operatingSystem: "Web",
+              operatingSystem: p.playStoreUrl ? "Web, Android" : "Web",
+              ...(p.playStoreUrl && {
+                installUrl: p.playStoreUrl,
+                sameAs: [p.playStoreUrl],
+              }),
               creator: { "@id": personId },
             }
           : {

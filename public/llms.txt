@@ -21,7 +21,7 @@
 ## Ventures
 
 - [Eduble Startup Inc.](https://eduble.ph): A Filipino edtech startup building affordable learning apps for every learner, from grade school to the board exam and beyond.
-- [Reviewlution](https://reviewlution.online): A gamified reviewer for Philippine board exams with timed rounds, streaks, leaderboards, and a projected board rating. 8,700+ users across 557 schools.
+- [Reviewlution](https://reviewlution.online): A gamified reviewer for Philippine board exams with timed rounds, streaks, leaderboards, and a projected board rating. 8,700+ users across 557 schools. Also available as an Android app on [Google Play](https://play.google.com/store/apps/details?id=online.reviewlution.app).
 - [Arvotech IT Solutions](https://arvotech.solutions): A web studio that designs and engineers websites, web apps, UI/UX, and brand identities.
 
 ## Tech stack

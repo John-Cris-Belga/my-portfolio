@@ -4,6 +4,7 @@ export type Project = {
   image: string;
   description: string;
   highlight?: string;
+  playStoreUrl?: string;
   tags: string[];
   accent: string;
   /** Border glow color as "h s l", e.g. "43 74 70". */
@@ -28,7 +29,8 @@ export const projects: Project[] = [
     description:
       "A gamified reviewer for Philippine board exams — timed rounds, streaks, leaderboards, and a projected board rating that tells you if you're on track.",
     highlight: "8,700+ users · 557 schools",
-    tags: ["EdTech", "Web App", "Gamification"],
+    playStoreUrl: "https://play.google.com/store/apps/details?id=online.reviewlution.app",
+    tags: ["EdTech", "Web App", "Android App", "Gamification"],
     accent: "#F47C2F",
     glow: "23 90 68",
   },
