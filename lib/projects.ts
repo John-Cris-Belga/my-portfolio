@@ -1,8 +1,6 @@
 export type Project = {
   name: string;
   url: string;
-  /** Chip label when `url` isn't a tidy domain (e.g. a Play Store listing). */
-  hostLabel?: string;
   image: string;
   description: string;
   highlight?: string;
@@ -41,15 +39,13 @@ export const projects: Project[] = [
   },
   {
     name: "Passible",
-    // No public marketing domain yet, so the Play Store listing is the destination.
-    url: "https://play.google.com/store/apps/details?id=com.passible.app",
-    hostLabel: "play.google.com",
+    url: "https://passible.online",
     image: "/projects/passible.png",
     description:
-      "A free Android app that helps Filipino board exam takers prepare, with short daily lessons planned back from their exam date. It covers the teacher, nurse, and psychometrician exams, with more on the way.",
+      "A free review app that helps Filipino board exam takers prepare, with short daily lessons planned back from their exam date. It covers the teacher, nurse, and psychometrician exams, with more on the way.",
     playStoreUrl: "https://play.google.com/store/apps/details?id=com.passible.app",
     schemaType: "WebApplication",
-    tags: ["EdTech", "Android App", "Exam Review", "Philippines"],
+    tags: ["EdTech", "Web App", "Android App", "Exam Review"],
     accent: "#2A6A5E",
     glow: "169 45 60",
   },

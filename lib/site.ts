@@ -65,18 +65,14 @@ export function buildJsonLd() {
       },
       ...projects.map((p) => {
         if (p.schemaType === "WebApplication") {
-          const storeOnly = p.url.includes("play.google.com");
           return {
             "@type": "WebApplication",
-            // An app with no site of its own is identified under this site instead.
-            "@id": storeOnly
-              ? `${site.url}/#${p.name.toLowerCase().replace(/\W+/g, "-")}`
-              : `${p.url}/#app`,
+            "@id": `${p.url}/#app`,
             name: p.name,
             url: p.url,
             description: p.description,
             applicationCategory: "EducationalApplication",
-            operatingSystem: storeOnly ? "Android" : p.playStoreUrl ? "Web, Android" : "Web",
+            operatingSystem: p.playStoreUrl ? "Web, Android" : "Web",
             ...(p.playStoreUrl && {
               installUrl: p.playStoreUrl,
               sameAs: [p.playStoreUrl],

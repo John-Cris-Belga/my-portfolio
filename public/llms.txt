@@ -22,7 +22,7 @@
 
 - [Eduble Startup Inc.](https://eduble.ph): A Filipino edtech startup building affordable learning apps for every learner, from grade school to the board exam and beyond.
 - [Reviewlution](https://reviewlution.online): A gamified reviewer for Philippine board exams with timed rounds, streaks, leaderboards, and a projected board rating. 8,700+ users across 557 schools. Also available as an Android app on [Google Play](https://play.google.com/store/apps/details?id=online.reviewlution.app).
-- [Passible](https://play.google.com/store/apps/details?id=com.passible.app): A free Android app that helps Filipino board exam takers prepare, with short daily lessons planned back from their exam date. Covers the teacher, nurse, and psychometrician exams, with more on the way.
+- [Passible](https://passible.online): A free review app that helps Filipino board exam takers prepare, with short daily lessons planned back from their exam date. Covers the teacher, nurse, and psychometrician exams, with more on the way. Also available as an Android app on [Google Play](https://play.google.com/store/apps/details?id=com.passible.app).
 - [Eduble Store](https://store.eduble.ph): The official merch shop for Eduble's learning apps, with hoodies, tees, mugs, and caps printed locally. Reviewlution learners redeem the gift cheques they've earned, shipped anywhere in the Philippines.
 - [Arvotech IT Solutions](https://arvotech.solutions): A web studio that designs and engineers websites, web apps, UI/UX, and brand identities.
 
