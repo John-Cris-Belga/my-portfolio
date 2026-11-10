@@ -1,10 +1,14 @@
 export type Project = {
   name: string;
   url: string;
+  /** Chip label when `url` isn't a tidy domain (e.g. a Play Store listing). */
+  hostLabel?: string;
   image: string;
   description: string;
   highlight?: string;
   playStoreUrl?: string;
+  /** schema.org type used in the JSON-LD. Defaults to Organization. */
+  schemaType?: "Organization" | "OnlineStore" | "WebApplication";
   tags: string[];
   accent: string;
   /** Border glow color as "h s l", e.g. "43 74 70". */
@@ -30,9 +34,35 @@ export const projects: Project[] = [
       "A gamified reviewer for Philippine board exams — timed rounds, streaks, leaderboards, and a projected board rating that tells you if you're on track.",
     highlight: "8,700+ users · 557 schools",
     playStoreUrl: "https://play.google.com/store/apps/details?id=online.reviewlution.app",
+    schemaType: "WebApplication",
     tags: ["EdTech", "Web App", "Android App", "Gamification"],
     accent: "#F47C2F",
     glow: "23 90 68",
+  },
+  {
+    name: "Passible",
+    // No public marketing domain yet, so the Play Store listing is the destination.
+    url: "https://play.google.com/store/apps/details?id=com.passible.app",
+    hostLabel: "play.google.com",
+    image: "/projects/passible.png",
+    description:
+      "A free Android app that helps Filipino board exam takers prepare, with short daily lessons planned back from their exam date. It covers the teacher, nurse, and psychometrician exams, with more on the way.",
+    playStoreUrl: "https://play.google.com/store/apps/details?id=com.passible.app",
+    schemaType: "WebApplication",
+    tags: ["EdTech", "Android App", "Exam Review", "Philippines"],
+    accent: "#2A6A5E",
+    glow: "169 45 60",
+  },
+  {
+    name: "Eduble Store",
+    url: "https://store.eduble.ph",
+    image: "/projects/store-eduble.png",
+    description:
+      "The official merch shop for Eduble's learning apps — hoodies, tees, mugs, and caps, printed locally. Reviewlution learners redeem the gift cheques they've earned, shipped anywhere in the Philippines.",
+    schemaType: "OnlineStore",
+    tags: ["E-commerce", "Web App", "Merch", "Gift Redemption"],
+    accent: "#E8B84B",
+    glow: "42 77 70",
   },
   {
     name: "Arvotech IT Solutions",

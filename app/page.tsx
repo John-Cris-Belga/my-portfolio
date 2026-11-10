@@ -91,7 +91,7 @@ export default function Home() {
       <section id="ventures" data-cursor="native" className="relative mt-24 sm:mt-32 w-full max-w-300">
         <SectionHeading title="Ventures" subtitle="Companies and products I've co-founded and built." />
         {/* Extra room around the grid so the skipped-render clip doesn't cut off the card glows. */}
-        <div className="[content-visibility:auto] -mx-12 -mb-12 -mt-2 p-12 [contain-intrinsic-size:auto_1610px] md:[contain-intrinsic-size:auto_1100px] lg:[contain-intrinsic-size:auto_590px]">
+        <div className="[content-visibility:auto] -mx-12 -mb-12 -mt-2 p-12 [contain-intrinsic-size:auto_2700px] md:[contain-intrinsic-size:auto_1660px] lg:[contain-intrinsic-size:auto_1200px]">
           <VentureGrid>
             {projects.map((project) => (
               <BorderGlow

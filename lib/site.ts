@@ -6,9 +6,9 @@ export const site = {
   name: "Chris Belga",
   title: "Chris Belga — Web Developer & HubSpot Admin",
   shortDescription:
-    "Web developer and HubSpot admin from Bicol, Philippines. Building web apps with React, Next.js, and Node.js — and the startups Eduble, Reviewlution, and Arvotech.",
+    "Web developer and HubSpot admin from Bicol, Philippines. Building web apps with React, Next.js, and Node.js — and the startups Eduble, Reviewlution, Passible, and Arvotech.",
   description:
-    "Chris Belga is a full-stack web developer and HubSpot admin based in Bicol, Philippines, with 6 years of experience. A mechanical engineer turned software developer, he builds web apps with React, Next.js, and Node.js, and is the builder behind Eduble, Reviewlution, and Arvotech IT Solutions. Available for projects.",
+    "Chris Belga is a full-stack web developer and HubSpot admin based in Bicol, Philippines, with 6 years of experience. A mechanical engineer turned software developer, he builds web apps with React, Next.js, and Node.js, and is the builder behind Eduble, Reviewlution, Passible, and Arvotech IT Solutions. Available for projects.",
   jobTitles: ["Web Developer", "HubSpot Admin"],
   email: "inquiry@chrisbelga.dev",
   location: { region: "Bicol", country: "PH", countryName: "Philippines" },
@@ -31,6 +31,7 @@ export const site = {
     "freelance web developer",
     "Eduble",
     "Reviewlution",
+    "Passible",
     "Arvotech IT Solutions",
   ],
 };
@@ -62,31 +63,36 @@ export function buildJsonLd() {
         })),
         sameAs: site.sameAs,
       },
-      ...projects.map((p) =>
-        p.url.includes("reviewlution")
-          ? {
-              "@type": "WebApplication",
-              "@id": `${p.url}/#app`,
-              name: p.name,
-              url: p.url,
-              description: p.description,
-              applicationCategory: "EducationalApplication",
-              operatingSystem: p.playStoreUrl ? "Web, Android" : "Web",
-              ...(p.playStoreUrl && {
-                installUrl: p.playStoreUrl,
-                sameAs: [p.playStoreUrl],
-              }),
-              creator: { "@id": personId },
-            }
-          : {
-              "@type": "Organization",
-              "@id": `${p.url}/#organization`,
-              name: p.name,
-              url: p.url,
-              description: p.description,
-              founder: { "@id": personId },
-            },
-      ),
+      ...projects.map((p) => {
+        if (p.schemaType === "WebApplication") {
+          const storeOnly = p.url.includes("play.google.com");
+          return {
+            "@type": "WebApplication",
+            // An app with no site of its own is identified under this site instead.
+            "@id": storeOnly
+              ? `${site.url}/#${p.name.toLowerCase().replace(/\W+/g, "-")}`
+              : `${p.url}/#app`,
+            name: p.name,
+            url: p.url,
+            description: p.description,
+            applicationCategory: "EducationalApplication",
+            operatingSystem: storeOnly ? "Android" : p.playStoreUrl ? "Web, Android" : "Web",
+            ...(p.playStoreUrl && {
+              installUrl: p.playStoreUrl,
+              sameAs: [p.playStoreUrl],
+            }),
+            creator: { "@id": personId },
+          };
+        }
+        return {
+          "@type": p.schemaType ?? "Organization",
+          "@id": `${p.url}/#organization`,
+          name: p.name,
+          url: p.url,
+          description: p.description,
+          founder: { "@id": personId },
+        };
+      }),
       {
         "@type": "ProfilePage",
         "@id": `${site.url}/#profilepage`,

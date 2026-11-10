@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 const ProjectCard = ({ project }) => {
-  const host = project.url.replace(/^https?:\/\//, "");
+  const host = project.hostLabel ?? project.url.replace(/^https?:\/\//, "");
 
   return (
     <div className="group relative flex h-full flex-col overflow-hidden rounded-[inherit] bg-[radial-gradient(120%_70%_at_0%_0%,color-mix(in_srgb,var(--accent,#6366f1)_22%,transparent),transparent_65%)] has-[>a:focus-visible]:outline-2 has-[>a:focus-visible]:outline-offset-2 has-[>a:focus-visible]:outline-cyan-400">
