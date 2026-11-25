@@ -71,6 +71,7 @@ export const projects: Project[] = [
     name: "Arvotech IT Solutions",
     url: "https://arvotech.solutions",
     image: "/projects/arvotech.png",
+    logo: "/projects/arvotech-logo.png",
     description:
       "A web studio that designs and engineers websites, web apps, UI/UX, and brand identities. Built in Bicol, deployed worldwide.",
     tags: ["Agency", "Websites", "Web Apps"],
