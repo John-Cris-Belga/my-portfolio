@@ -132,11 +132,21 @@
       hsl(93, 100%, 69%));
   transform: translate3d(calc((0.5 - var(--pointer-from-left)) * 30%),
       calc((0.5 - var(--pointer-from-top)) * 30%), 0);
-  will-change: transform;
 }
 
 .pc-card-shell.active .pc-shine {
   opacity: 0.28;
+}
+
+/* Promote the moving layers only while the card is actually being tilted. Held permanently,
+   three extra composited layers stay resident for the whole visit for no benefit. */
+.pc-card-shell:hover .pc-shine::before,
+.pc-card-shell.active .pc-shine::before,
+.pc-card-shell:hover .pc-glare::before,
+.pc-card-shell.active .pc-glare::before,
+.pc-card-shell:hover .pc-avatar-content .avatar,
+.pc-card-shell.active .pc-avatar-content .avatar {
+  will-change: transform;
 }
 
 /* Glare: a still edge vignette (painted once) plus a soft highlight that slides with the
@@ -160,11 +170,9 @@
       transparent 35%);
   transform: translate3d(calc((var(--pointer-from-left) - 0.5) * 50%),
       calc((var(--pointer-from-top) - 0.5) * 50%), 0);
-  will-change: transform;
 }
 
 .pc-avatar-content {
-  mix-blend-mode: luminosity;
   overflow: visible;
   transform: translateZ(2);
   backface-visibility: hidden;
@@ -182,7 +190,6 @@
   transform: translateX(calc(-50% + (var(--pointer-from-left) - 0.5) * 6px)) translateZ(0) scaleY(calc(1 + (var(--pointer-from-top) - 0.5) * 0.02)) scaleX(calc(1 + (var(--pointer-from-left) - 0.5) * 0.01));
   bottom: -1px;
   backface-visibility: hidden;
-  will-change: transform;
   transition: transform 120ms ease-out, opacity 1s ease;
 }
 

@@ -129,6 +129,9 @@ export default function DarkVeil({
         // The veil is a soft gradient, so render a low-res buffer and let the browser upscale it.
         const bw = Math.max(1, Math.round(parent.clientWidth * resolutionScale));
         const bh = Math.max(1, Math.round(parent.clientHeight * resolutionScale));
+        // Assigning width/height reallocates the GL backing store even when the value is
+        // unchanged. Android fires resize whenever the URL bar slides away, mid-scroll.
+        if (bw === canvas.width && bh === canvas.height) return;
         canvas.width = bw;
         canvas.height = bh;
         gl.viewport(0, 0, bw, bh);

@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./BorderGlow.css";
 
 // Adapted from React Bits "Border Glow" (dark surfaces only, no intro sweep).
@@ -51,11 +51,32 @@ const BorderGlow = ({
   fillOpacity = 0.5,
 }) => {
   const cardRef = useRef(null);
+  // Measured once per hover. Reading the rect inside the move handler forces a layout,
+  // because the handler has just written custom properties to this same element.
+  const rectRef = useRef(null);
+  const [hovered, setHovered] = useState(false);
+
+  const measure = useCallback(() => {
+    rectRef.current = cardRef.current?.getBoundingClientRect() ?? null;
+  }, []);
+
+  // Scrolling moves the card out from under a resting cursor, so re-measure then too —
+  // far rarer than pointermove, and not interleaved with a write to this element.
+  useEffect(() => {
+    if (!hovered) return;
+    const onScroll = () => measure();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [hovered, measure]);
 
   const handlePointerMove = useCallback((e) => {
     const card = cardRef.current;
-    if (!card) return;
-    const rect = card.getBoundingClientRect();
+    const rect = rectRef.current;
+    if (!card || !rect) return;
     const cx = rect.width / 2;
     const cy = rect.height / 2;
     const dx = e.clientX - rect.left - cx;
@@ -78,6 +99,11 @@ const BorderGlow = ({
   return (
     <div
       ref={cardRef}
+      onPointerEnter={() => {
+        measure();
+        setHovered(true);
+      }}
+      onPointerLeave={() => setHovered(false)}
       onPointerMove={handlePointerMove}
       className={`border-glow-card ${className}`.trim()}
       style={{

@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
@@ -140,6 +139,13 @@
    drop the edge blurs, which re-blur whatever moves beneath them on every frame. */
 [data-perf="lite"] .gradual-blur {
     display: none;
+}
+
+/* Phones pay the most for backdrop-filter and show the least of the fade, so they skip it. */
+@media (max-width: 640px) {
+    .gradual-blur {
+        display: none;
+    }
 }
 
 /* Decorative visuals: a long press shouldn't select them (iOS paints the whole hero blue with

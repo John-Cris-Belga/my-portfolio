@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useAfterIdle } from "@/lib/useAfterIdle";
 import { startPerfGovernor } from "@/lib/perfMode";
+import { useMediaQuery, FINE_POINTER } from "@/lib/useMediaQuery";
 
 // Purely decorative, so none of this is server-rendered or in the initial JavaScript:
 // each piece (and the libraries it needs) is fetched once the page is idle.
@@ -13,6 +14,10 @@ const TargetCursor = dynamic(() => import("./TargetCursor"), { ssr: false });
 export default function BackgroundEffects() {
   const idle = useAfterIdle();
   const later = useAfterIdle(600);
+  // The cursor renders nothing without a mouse, so touch devices shouldn't fetch it or gsap.
+  const finePointer = useMediaQuery(FINE_POINTER);
+  // The veil is a slow-drifting gradient; phones can afford a third of the fragments.
+  const small = useMediaQuery("(max-width: 640px)");
 
   useEffect(() => {
     if (later) return startPerfGovernor();
@@ -29,14 +34,14 @@ export default function BackgroundEffects() {
             speed={1.5}
             scanlineFrequency={0}
             warpAmount={0}
-            resolutionScale={0.5}
+            resolutionScale={small ? 0.33 : 0.5}
           />
         )}
       </div>
       <div className="pointer-events-none fixed right-0 top-[5vh] h-[90vh] w-full sm:w-1/2">
         {idle && <TechStackBackground />}
       </div>
-      {later && <TargetCursor />}
+      {later && finePointer && <TargetCursor />}
     </>
   );
 }

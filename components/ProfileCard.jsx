@@ -55,6 +55,16 @@ const ProfileCardComponent = ({
 
   const enterTimerRef = useRef(null);
   const leaveRafRef = useRef(null);
+  // The card's box, measured on enter and on resize. Reading it inside the tilt loop or a
+  // pointermove forced a layout each time, because both write custom properties first.
+  const boxRef = useRef(null);
+  const measureBox = useCallback(() => {
+    const shell = shellRef.current;
+    if (!shell) return null;
+    const rect = shell.getBoundingClientRect();
+    boxRef.current = rect;
+    return rect;
+  }, []);
 
   const tiltEngine = useMemo(() => {
     if (!enableTilt) return null;
@@ -77,8 +87,9 @@ const ProfileCardComponent = ({
       const wrap = wrapRef.current;
       if (!shell || !wrap) return;
 
-      const width = shell.clientWidth || 1;
-      const height = shell.clientHeight || 1;
+      const box = boxRef.current;
+      const width = (box ? box.width : shell.clientWidth) || 1;
+      const height = (box ? box.height : shell.clientHeight) || 1;
 
       const percentX = clamp((100 / width) * x);
       const percentY = clamp((100 / height) * y);
@@ -172,19 +183,16 @@ const ProfileCardComponent = ({
     };
   }, [enableTilt]);
 
-  const getOffsets = (evt, el) => {
-    const rect = el.getBoundingClientRect();
-    return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
-  };
 
   const handlePointerMove = useCallback(
     (event) => {
       const shell = shellRef.current;
       if (!shell || !tiltEngine) return;
-      const { x, y } = getOffsets(event, shell);
-      tiltEngine.setTarget(x, y);
+      const rect = boxRef.current ?? measureBox();
+      if (!rect) return;
+      tiltEngine.setTarget(event.clientX - rect.left, event.clientY - rect.top);
     },
-    [tiltEngine],
+    [tiltEngine, measureBox],
   );
 
   const handlePointerEnter = useCallback(
@@ -199,10 +207,10 @@ const ProfileCardComponent = ({
         shell.classList.remove("entering");
       }, ANIMATION_CONFIG.ENTER_TRANSITION_MS);
 
-      const { x, y } = getOffsets(event, shell);
-      tiltEngine.setTarget(x, y);
+      const rect = measureBox();
+      if (rect) tiltEngine.setTarget(event.clientX - rect.left, event.clientY - rect.top);
     },
-    [tiltEngine],
+    [tiltEngine, measureBox],
   );
 
   const handlePointerLeave = useCallback(() => {
@@ -263,6 +271,9 @@ const ProfileCardComponent = ({
     const pointerLeaveHandler = handlePointerLeave;
     const deviceOrientationHandler = handleDeviceOrientation;
 
+    const invalidateBox = () => measureBox();
+    window.addEventListener("resize", invalidateBox);
+    window.addEventListener("scroll", invalidateBox, { passive: true });
     shell.addEventListener("pointerenter", pointerEnterHandler);
     shell.addEventListener("pointermove", pointerMoveHandler);
     shell.addEventListener("pointerleave", pointerLeaveHandler);
@@ -304,6 +315,8 @@ const ProfileCardComponent = ({
 
     return () => {
       cancelIntro();
+      window.removeEventListener("resize", invalidateBox);
+      window.removeEventListener("scroll", invalidateBox);
       shell.removeEventListener("pointerenter", pointerEnterHandler);
       shell.removeEventListener("pointermove", pointerMoveHandler);
       shell.removeEventListener("pointerleave", pointerLeaveHandler);
@@ -322,6 +335,7 @@ const ProfileCardComponent = ({
     handlePointerEnter,
     handlePointerLeave,
     handleDeviceOrientation,
+    measureBox,
   ]);
 
   const cardStyle = useMemo(

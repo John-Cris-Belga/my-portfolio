@@ -11,6 +11,16 @@
 
 .gradual-blur {
   isolation: isolate;
+  pointer-events: none;
+  transition: opacity 0.3s ease-out;
+}
+
+.gradual-blur-parent {
+  overflow: hidden;
+}
+
+.gradual-blur-inner {
+  pointer-events: none;
 }
 
 @supports not (backdrop-filter: blur(1px)) {

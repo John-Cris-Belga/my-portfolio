@@ -17,6 +17,9 @@ export default function VentureGrid({ children, radius = 320 }) {
     const target = { x: 0, y: 0 };
     let frame = 0;
     let last = 0;
+    // Cached: reading the rect per pointermove forces a layout, because the follow loop
+    // has just written --x/--y to this element. It only changes on scroll or resize.
+    let rect = null;
 
     const apply = () => {
       el.style.setProperty("--x", `${pos.x.toFixed(1)}px`);
@@ -31,13 +34,20 @@ export default function VentureGrid({ children, radius = 320 }) {
       apply();
       frame = Math.abs(target.x - pos.x) + Math.abs(target.y - pos.y) > 0.3 ? requestAnimationFrame(follow) : 0;
     };
+    const measure = () => {
+      rect = el.getBoundingClientRect();
+    };
     const local = (e) => {
-      const r = el.getBoundingClientRect();
-      target.x = e.clientX - r.left;
-      target.y = e.clientY - r.top;
+      if (!rect) measure();
+      target.x = e.clientX - rect.left;
+      target.y = e.clientY - rect.top;
+    };
+    const invalidate = () => {
+      rect = null;
     };
 
     const onEnter = (e) => {
+      measure();
       local(e);
       Object.assign(pos, target);
       apply();
@@ -52,10 +62,14 @@ export default function VentureGrid({ children, radius = 320 }) {
     };
     const onLeave = () => el.classList.remove("is-chroma");
 
+    window.addEventListener("scroll", invalidate, { passive: true });
+    window.addEventListener("resize", invalidate);
     el.addEventListener("pointerenter", onEnter);
     el.addEventListener("pointermove", onMove);
     el.addEventListener("pointerleave", onLeave);
     return () => {
+      window.removeEventListener("scroll", invalidate);
+      window.removeEventListener("resize", invalidate);
       el.removeEventListener("pointerenter", onEnter);
       el.removeEventListener("pointermove", onMove);
       el.removeEventListener("pointerleave", onLeave);
