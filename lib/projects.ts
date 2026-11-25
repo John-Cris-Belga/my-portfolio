@@ -4,7 +4,10 @@ export type Project = {
   image: string;
   description: string;
   highlight?: string;
+  /** Official logo mark, shown beside the name. Needs a transparent background. */
+  logo?: string;
   playStoreUrl?: string;
+  appStoreUrl?: string;
   /** schema.org type used in the JSON-LD. Defaults to Organization. */
   schemaType?: "Organization" | "OnlineStore" | "WebApplication";
   tags: string[];
@@ -28,12 +31,14 @@ export const projects: Project[] = [
     name: "Reviewlution",
     url: "https://reviewlution.online",
     image: "/projects/reviewlution.png",
+    logo: "/projects/reviewlution-logo.png",
     description:
       "A gamified reviewer for Philippine board exams — timed rounds, streaks, leaderboards, and a projected board rating that tells you if you're on track.",
-    highlight: "8,700+ users · 557 schools",
+    highlight: "11,500+ players · 613 schools",
     playStoreUrl: "https://play.google.com/store/apps/details?id=online.reviewlution.app",
+    appStoreUrl: "https://apps.apple.com/ph/app/reviewlution/id6820003421",
     schemaType: "WebApplication",
-    tags: ["EdTech", "Web App", "Android App", "Gamification"],
+    tags: ["EdTech", "Web App", "iOS App", "Android App"],
     accent: "#F47C2F",
     glow: "23 90 68",
   },

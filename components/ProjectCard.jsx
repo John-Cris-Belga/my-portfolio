@@ -31,28 +31,65 @@ const ProjectCard = ({ project }) => {
       </div>
 
       <div className="pointer-events-none flex flex-1 flex-col gap-3 p-5">
-        <h3 className="text-lg font-semibold text-white">{project.name}</h3>
+        <div className="flex items-center gap-2.5">
+          {project.logo && (
+            // Decorative: the name sits right beside it, so it isn't announced twice.
+            <Image
+              src={project.logo}
+              alt=""
+              aria-hidden="true"
+              width={256}
+              height={256}
+              className="h-7 w-7 shrink-0 object-contain"
+            />
+          )}
+          <h3 className="text-lg font-semibold text-white">{project.name}</h3>
+        </div>
         <p className="text-sm leading-relaxed text-gray-400">{project.description}</p>
         {project.highlight && (
           <p className="font-mono text-xs text-green-400">{project.highlight}</p>
         )}
-        {project.playStoreUrl && (
-          <a
-            href={project.playStoreUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Get ${project.name} on Google Play`}
-            className="pointer-events-auto relative z-10 -my-2 -ml-2.5 w-fit rounded-lg transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-cyan-400"
-          >
-            {/* The official badge PNG includes its own transparent padding, offset by the negative margins. */}
-            <Image
-              src="/google-play-badge.png"
-              alt="Get it on Google Play"
-              width={646}
-              height={250}
-              className="h-[58px] w-auto"
-            />
-          </a>
+        {(project.playStoreUrl || project.appStoreUrl) && (
+          <div className="-my-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+            {project.appStoreUrl && (
+              <a
+                href={project.appStoreUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Download ${project.name} on the App Store`}
+                className="pointer-events-auto relative z-10 w-fit rounded-lg transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400"
+              >
+                {/* Apple's official badge, unmodified, at its 40px minimum height. It carries no
+                    padding of its own, so it sits flush and sets the row's left edge. */}
+                <Image
+                  src="/app-store-badge.svg"
+                  alt="Download on the App Store"
+                  width={120}
+                  height={40}
+                  className="h-[40px] w-auto"
+                />
+              </a>
+            )}
+            {project.playStoreUrl && (
+              <a
+                href={project.playStoreUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Get ${project.name} on Google Play`}
+                className="pointer-events-auto relative z-10 -mx-2.5 w-fit rounded-lg transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-cyan-400"
+              >
+                {/* Google's badge PNG bakes in its own transparent padding; the negative margins
+                    cancel it so both badges read as the same size with an even gap between. */}
+                <Image
+                  src="/google-play-badge.png"
+                  alt="Get it on Google Play"
+                  width={646}
+                  height={250}
+                  className="h-[58px] w-auto"
+                />
+              </a>
+            )}
+          </div>
         )}
         <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
           {project.tags.map((tag) => (

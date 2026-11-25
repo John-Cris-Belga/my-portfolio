@@ -65,6 +65,7 @@ export function buildJsonLd() {
       },
       ...projects.map((p) => {
         if (p.schemaType === "WebApplication") {
+          const storeUrls = [p.playStoreUrl, p.appStoreUrl].filter(Boolean);
           return {
             "@type": "WebApplication",
             "@id": `${p.url}/#app`,
@@ -72,11 +73,10 @@ export function buildJsonLd() {
             url: p.url,
             description: p.description,
             applicationCategory: "EducationalApplication",
-            operatingSystem: p.playStoreUrl ? "Web, Android" : "Web",
-            ...(p.playStoreUrl && {
-              installUrl: p.playStoreUrl,
-              sameAs: [p.playStoreUrl],
-            }),
+            operatingSystem: ["Web", p.playStoreUrl && "Android", p.appStoreUrl && "iOS"]
+              .filter(Boolean)
+              .join(", "),
+            ...(storeUrls.length && { installUrl: storeUrls, sameAs: storeUrls }),
             creator: { "@id": personId },
           };
         }
