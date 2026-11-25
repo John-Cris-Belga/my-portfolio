@@ -29,12 +29,6 @@ const coderData = {
       href: 'https://www.linkedin.com/in/chris-b-730791112/',
       download: false
     },
-    {
-      key: 'resume',
-      label: 'download cv',
-      href: '/C.V - Belga, Chris.pdf',
-      download: true
-    },
   ]
 };
 

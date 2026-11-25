@@ -170,7 +170,17 @@ export default function TargetCursor({
       if (target && scope.contains(target)) lock(target);
       else release();
     };
+    // elementFromPoint and getBoundingClientRect both flush layout, so coalesce them into
+    // one run per frame instead of one per scroll event.
+    let scrollFrame = 0;
     const onScroll = () => {
+      if (scrollFrame) return;
+      scrollFrame = requestAnimationFrame(() => {
+        scrollFrame = 0;
+        syncToPointer();
+      });
+    };
+    const syncToPointer = () => {
       const under = shown ? document.elementFromPoint(lastX, lastY) : null;
       if (under) syncZone(under);
       if (!activeTarget || suppressed) return;
@@ -206,6 +216,7 @@ export default function TargetCursor({
       scope.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("scroll", onScroll);
+      if (scrollFrame) cancelAnimationFrame(scrollFrame);
       gsap.ticker.remove(ticker);
       spin?.kill();
       gsap.killTweensOf([cursor, dot, ...corners]);

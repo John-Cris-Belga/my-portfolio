@@ -19,8 +19,17 @@ const BORDER_OFFSET = 30;
 const FRAME_MS = 1000 / 30;
 
 const LUT_SIZE = 8192;
-const LUT = new Float32Array(LUT_SIZE);
-for (let n = 0; n < LUT_SIZE; n++) LUT[n] = (Math.sin(n * 12.9898) * 43758.5453) % 1;
+// Built on the first frame that needs it, not at module evaluation: a visit that never
+// animates the border (lite mode, reduced motion, card off-screen) shouldn't pay 8192
+// Math.sin calls while the initial chunk is being parsed.
+let lut = null;
+const noiseTable = () => {
+  if (!lut) {
+    lut = new Float32Array(LUT_SIZE);
+    for (let n = 0; n < LUT_SIZE; n++) lut[n] = (Math.sin(n * 12.9898) * 43758.5453) % 1;
+  }
+  return lut;
+};
 
 function roundedRectPoint(t, left, top, width, height, radius, out) {
   const sw = width - 2 * radius;
@@ -135,6 +144,7 @@ const ElectricBorder = ({
       ctx.beginPath();
 
       const mask = LUT_SIZE - 1;
+      const LUT = noiseTable();
       for (let i = 0; i < count; i++) {
         const x = noiseX[i];
         let nx = 0;
