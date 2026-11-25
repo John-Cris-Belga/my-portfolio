@@ -4,7 +4,7 @@ export type Project = {
   image: string;
   description: string;
   highlight?: string;
-  /** Official logo mark, shown beside the name. Needs a transparent background. */
+  /** Official logo, shown beside the name. A transparent mark or an app-icon tile. */
   logo?: string;
   playStoreUrl?: string;
   appStoreUrl?: string;
@@ -21,6 +21,7 @@ export const projects: Project[] = [
     name: "Eduble Startup Inc.",
     url: "https://eduble.ph",
     image: "/projects/eduble.png",
+    logo: "/projects/eduble-logo.svg",
     description:
       "A Filipino edtech startup building affordable learning apps for every learner — from grade school, to the board exam, to the profession beyond it.",
     tags: ["Startup", "EdTech"],
@@ -46,6 +47,7 @@ export const projects: Project[] = [
     name: "Passible",
     url: "https://passible.online",
     image: "/projects/passible.png",
+    logo: "/projects/passible-logo.png",
     description:
       "A free review app that helps Filipino board exam takers prepare, with short daily lessons planned back from their exam date. It covers the teacher, nurse, and psychometrician exams, with more on the way.",
     playStoreUrl: "https://play.google.com/store/apps/details?id=com.passible.app",

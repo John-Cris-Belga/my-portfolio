@@ -34,13 +34,15 @@ const ProjectCard = ({ project }) => {
         <div className="flex items-center gap-2.5">
           {project.logo && (
             // Decorative: the name sits right beside it, so it isn't announced twice.
+            // Rounded because some of these are app-icon tiles with their own background,
+            // where square corners would read as a mistake beside the free-standing marks.
             <Image
               src={project.logo}
               alt=""
               aria-hidden="true"
               width={256}
               height={256}
-              className="h-7 w-7 shrink-0 object-contain"
+              className="h-7 w-7 shrink-0 rounded-md object-contain"
             />
           )}
           <h3 className="text-lg font-semibold text-white">{project.name}</h3>
