@@ -1,17 +1,21 @@
 import type { NextConfig } from "next";
 
+// Art that only changes by being replaced wholesale: let browsers reuse it for a day,
+// and keep serving the cached copy while re-checking in the background.
+const REUSE_FOR_A_DAY = "public, max-age=86400, stale-while-revalidate=604800";
+
 const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Photos and preview images rarely change: let browsers reuse them for a day,
-        // and keep serving the cached copy while re-checking in the background.
         source: "/:dir(profile|projects)/:file*",
-        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
+        headers: [{ key: "Cache-Control", value: REUSE_FOR_A_DAY }],
       },
       {
-        source: "/iconpattern.webp",
-        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
+        // Root-level art: the pattern and the two store badges. Without this they fall back
+        // to Next's default for /public, which revalidates them on every page load.
+        source: "/:file(iconpattern.webp|google-play-badge.png|app-store-badge.svg)",
+        headers: [{ key: "Cache-Control", value: REUSE_FOR_A_DAY }],
       },
     ];
   },
